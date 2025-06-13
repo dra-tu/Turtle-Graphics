@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class TurtelPanel extends JPanel {
@@ -18,6 +17,7 @@ public class TurtelPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         for (Line line : lines) {
             line.draw(g);
         }

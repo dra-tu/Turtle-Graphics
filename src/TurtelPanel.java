@@ -5,13 +5,16 @@ import java.util.ArrayList;
 public class TurtelPanel extends JPanel {
     private ArrayList<Line> lines;
     private Point turtelPos;
-    private static final int MAX_X = 500;
-    private static final int MAX_Y = 500;
+    private int maxX;
+    private int maxY;
 
-    public TurtelPanel() {
+    public TurtelPanel(int width, int height) {
+        maxX = width;
+        maxY = height;
+
         lines = new ArrayList<>();
-        turtelPos = new Point(MAX_X/2, MAX_Y/2);
-        setPreferredSize(new Dimension(MAX_X, MAX_Y));
+        turtelPos = new Point(maxX/2, maxY/2);
+        setPreferredSize(new Dimension(maxX, maxY));
     }
 
     @Override

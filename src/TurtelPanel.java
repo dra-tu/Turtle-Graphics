@@ -12,6 +12,7 @@ public class TurtelPanel extends JPanel {
         maxX = width;
         maxY = height;
 
+        setBorder(BorderFactory.createLineBorder(Color.BLACK));
         lines = new ArrayList<>();
         turtelPos = new Point(maxX/2, maxY/2);
         setPreferredSize(new Dimension(maxX, maxY));
@@ -33,5 +34,8 @@ public class TurtelPanel extends JPanel {
 
         turtelPos.x = newX;
         turtelPos.y = newY;
+    }
+
+    public void executeCommands(String commands) {
     }
 }

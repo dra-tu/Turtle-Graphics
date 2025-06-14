@@ -63,23 +63,22 @@ public class TurtelPanel extends JPanel {
                 .filter(l -> !l.isBlank() && !l.startsWith("#"))
                 .toArray(String[]::new);
 
-        lines.clear();
+        reset();
 
         for (int i = 0; i < commands.length; i++) {
-            System.out.println("Line " + i + ": " + commands[i]);
-
             String[] command = commands[i].split(" ", 2);
+            String[] args = command[1].split(" ");
 
             switch (command[0]) {
                 case "MOVE":
-                    if (command.length != 2) continue;
-                    int length = Integer.parseInt(command[1]);
+                    if (args.length != 1) continue;
+                    int length = Integer.parseInt(args[0]);
                     move(length);
                     break;
                 case "ROTATE":
-                    if (command.length != 3) continue;
-                    int angel = Integer.parseInt(command[2]);
-                    rotate(command[1], angel);
+                    if (args.length != 2) continue;
+                    int angel = Integer.parseInt(args[1]);
+                    rotate(args[0], angel);
                     break;
             }
         }

@@ -12,8 +12,8 @@ public class Controller extends JPanel implements ActionListener {
 
     public Controller(int width, int height, TurtelPanel turtelPanel) {
         this.turtelPanel = turtelPanel;
+
         inputArea = new JTextArea();
-        inputArea.setPreferredSize(new Dimension(width, height));
         inputArea.setBorder(BorderFactory.createLineBorder(Color.RED));
 
         JButton startButton = new JButton(START);
@@ -26,7 +26,10 @@ public class Controller extends JPanel implements ActionListener {
         buttonPanel.add(startButton);
         buttonPanel.add(clearButton);
 
-        this.add(inputArea);
+        JScrollPane scroll = new JScrollPane(inputArea);
+        scroll.setPreferredSize(new Dimension(width, height));
+
+        this.add(scroll);
         this.add(buttonPanel);
     }
 

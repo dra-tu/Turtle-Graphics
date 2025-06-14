@@ -126,8 +126,11 @@ public class TurtelPanel extends JPanel {
             String[] command = commands[i].split(" ", 2);
 
             String[] args = (command.length > 1)
-                    ? command[1].split(" ")
+                    ? command[1].split(",")
                     : new String[0];
+            for (int j = 0; j < args.length; j++) {
+                args[j] = args[j].trim();
+            }
 
             if (inFun && !command[0].equals("END") && !command[0].equals("FUN")) {
                 funBody.append(commands[i]).append("\n");
@@ -137,17 +140,19 @@ public class TurtelPanel extends JPanel {
             try {
                 switch (command[0]) {
                     case "MOVE":
-                        int length = parse(values, funValues, command[1]);
+                        if (args.length != 1) continue;
+                        int length = parse(values, funValues, args[0]);
                         move(length);
                         break;
                     case "ROTATE":
-                        int angel = parse(values, funValues, command[1].replace(args[0] + " ", ""));
+                        if (args.length != 2) continue;
+                        int angel = parse(values, funValues, args[1]);
                         rotate(args[0], angel);
                         break;
 
                     case "VAL":
-                        values.put(args[0], parse(values, funValues, command[1].replace(args[0] + " ", "")));
-
+                        if (args.length != 2) continue;
+                        values.put(args[0], parse(values, funValues, args[1]));
                         break;
 
                     case "FUN":

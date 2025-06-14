@@ -101,6 +101,22 @@ public class TurtelPanel extends JPanel {
         }
     }
 
+    private static class NoCompOperatorException extends RuntimeException {}
+    private boolean parseIf(int input) throws NoCompOperatorException {
+
+        // TODO: SPLITTE THE INPUT IN a, b, and op
+
+        return switch (op) {
+            case "==" -> a == b;
+            case "!=" -> a != b;
+            case "<" -> a < b;
+            case ">" -> a > b;
+            case "<=" -> a <= b;
+            case ">=" -> a >= b;
+            default -> throw new NoCompOperatorException();
+        };
+    }
+
     private int parse(HashMap<String, Integer> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
         if (value.startsWith("CALC ")) {
             value = value.replace("CALC ", "");
@@ -220,6 +236,16 @@ public class TurtelPanel extends JPanel {
                         inFun = false;
                         funMap.put(funName, new Function(funArgsNames, funBody.toString()));
                         break;
+                    case "CALL-IF":
+                        if (args.length < 2) {
+                            addError(ErrorType.ARG_NUM, i);
+                            continue;
+                        }
+                        boolean result = parseIf(args[0]);
+                        if (result) continue;
+                        String[] newArgs = new String[args.length-3];
+                        System.arraycopy(args, 3, newArgs, 0, newArgs.length);
+                        args = newArgs;
                     case "CALL":
                         Function callFun = funMap.get(args[0]);
                         if (callFun == null) {
@@ -241,6 +267,9 @@ public class TurtelPanel extends JPanel {
                 }
             } catch (NumberFormatException ignored) {
                 addError(ErrorType.NOT_A_NUM, i);
+            } catch (NoCompOperatorException ignored) {
+                // TODO
+                System.out.println("NOOOOOOOOO");
             }
         }
 

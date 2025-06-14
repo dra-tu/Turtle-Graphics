@@ -126,8 +126,9 @@ public class TurtelPanel extends JPanel {
             String[] command = commands[i].split(" ", 2);
 
             String[] args = (command.length > 1)
-                    ? command[1].split(" | ")
+                    ? command[1].split("\\|")
                     : new String[0];
+
             for (int j = 0; j < args.length; j++) {
                 args[j] = args[j].trim();
             }

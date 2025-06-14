@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TurtelPanel extends JPanel {
     private final ArrayList<Line> lines;
@@ -50,36 +51,125 @@ public class TurtelPanel extends JPanel {
     public void rotate(String direction, int angelDeg) {
         switch (direction) {
             case "R":
-                angel = (angel + Math.toRadians(angelDeg)) % (2*Math.PI);
+                angel = (angel + Math.toRadians(angelDeg)) % (2 * Math.PI);
                 break;
             case "L":
-                angel = (angel - Math.toRadians(angelDeg)) % (2*Math.PI);
+                angel = (angel - Math.toRadians(angelDeg)) % (2 * Math.PI);
                 break;
         }
     }
 
-    public void executeCommands(String commandList) {
-        String[] commands = commandList.lines()
-                .filter(l -> !l.isBlank() && !l.startsWith("#"))
-                .toArray(String[]::new);
+    private int parse(HashMap<String, Integer> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
+        if (value.startsWith("CALC ")) {
+            value = value.replace("CALC ", "");
+            String[] input = value.split(" ");
 
-        reset();
+            if (input.length != 3) throw new NumberFormatException();
+            return switch (input[1]) {
+                case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
+                case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
+                case "*" -> parse(values, funVals, input[0]) * parse(values, funVals, input[2]);
+                case "/" -> parse(values, funVals, input[0]) / parse(values, funVals, input[2]);
+                default -> throw new NumberFormatException();
+            };
+
+        } else if (value.contains(" ")) throw new NumberFormatException();
+
+        Integer funStored = funVals == null
+                ? null
+                : funVals.get(value);
+
+        if (funStored == null) {
+            Integer stored = values.get(value);
+            return stored == null
+                    ? Integer.parseInt(value)
+                    : stored;
+        } else {
+            return funStored;
+        }
+    }
+
+    public void executeCommands(String commandList) {
+        HashMap<String, Integer> values = new HashMap<>();
+        HashMap<String, Function> funMap = new HashMap<>();
+        HashMap<String, Integer> funValues = new HashMap<>();
+
+        executeCommands(commandList, true, values, funMap, funValues);
+    }
+
+    public void executeCommands(
+            String commandList,
+            boolean reset,
+            HashMap<String, Integer> values,
+            HashMap<String, Function> funMap,
+            HashMap<String, Integer> funValues
+    ) {
+        String[] commands = commandList.split("\n");
+
+        if (reset) reset();
+
+        boolean inFun = false;
+        String funName = null;
+        StringBuilder funBody = null;
+        String[] funArgsNames = null;
 
         for (int i = 0; i < commands.length; i++) {
-            String[] command = commands[i].split(" ", 2);
-            String[] args = command[1].split(" ");
+            if (commands[i].isBlank() || commands[i].startsWith("#")) continue;
 
-            switch (command[0]) {
-                case "MOVE":
-                    if (args.length != 1) continue;
-                    int length = Integer.parseInt(args[0]);
-                    move(length);
-                    break;
-                case "ROTATE":
-                    if (args.length != 2) continue;
-                    int angel = Integer.parseInt(args[1]);
-                    rotate(args[0], angel);
-                    break;
+            commands[i] = commands[i].trim();
+            String[] command = commands[i].split(" ", 2);
+
+            String[] args = (command.length > 1)
+                    ? command[1].split(" ")
+                    : new String[0];
+
+            if (inFun && !command[0].equals("END") && !command[0].equals("FUN")) {
+                funBody.append(commands[i]).append("\n");
+                continue;
+            }
+
+            try {
+                switch (command[0]) {
+                    case "MOVE":
+                        int length = parse(values, funValues, command[1]);
+                        move(length);
+                        break;
+                    case "ROTATE":
+                        int angel = parse(values, funValues, command[1].replace(args[0] + " ", ""));
+                        rotate(args[0], angel);
+                        break;
+
+                    case "VAL":
+                        values.put(args[0], parse(values, funValues, command[1].replace(args[0] + " ", "")));
+
+                        break;
+
+                    case "FUN":
+                        if (inFun) continue;
+                        inFun = true;
+                        funName = args[0];
+                        funBody = new StringBuilder();
+                        funArgsNames = new String[args.length - 1];
+                        System.arraycopy(args, 1, funArgsNames, 0, funArgsNames.length);
+                        break;
+                    case "END":
+                        if (!inFun) continue;
+                        inFun = false;
+                        funMap.put(funName, new Function(funArgsNames, funBody.toString()));
+                        break;
+                    case "CALL":
+                        Function callFun = funMap.get(args[0]);
+                        if (callFun == null || (args.length - 1) != callFun.getArgsCount()) continue;
+
+                        HashMap<String, Integer> callVals = new HashMap<>();
+                        for (int j = 0; j < callFun.getArgsCount(); j++) {
+                            callVals.put(callFun.getArgName(j), parse(values, null, args[j + 1]));
+                        }
+
+                        executeCommands(callFun.getBody(), false, values, funMap, callVals);
+                        break;
+                }
+            } catch (NumberFormatException ignored) {
             }
         }
 

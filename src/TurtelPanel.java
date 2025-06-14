@@ -50,8 +50,32 @@ public class TurtelPanel extends JPanel {
         }
     }
 
-    private final static String NEW_LINE = "\n";
+    public void executeCommands(String commandList) {
+        String[] commands = commandList.lines()
+                .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                .toArray(String[]::new);
 
-    public void executeCommands(String commands) {
+        lines.clear();
+
+        for (int i = 0; i < commands.length; i++) {
+            System.out.println("Line " + i + ": " + commands[i]);
+
+            String[] command = commands[i].split(" ", 2);
+
+            switch (command[0]) {
+                case "MOVE":
+                    if (command.length != 2) continue;
+                    int length = Integer.parseInt(command[1]);
+                    move(length);
+                    break;
+                case "ROTATE":
+                    if (command.length != 3) continue;
+                    int angel = Integer.parseInt(command[2]);
+                    rotate(command[1], angel);
+                    break;
+            }
+        }
+
+        repaint();
     }
 }

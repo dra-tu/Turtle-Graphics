@@ -53,7 +53,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     }
 
     private void highlight() {
-        String text = inputArea.getText();
+        String text = inputArea.getText().replace("\n", "");
         SwingUtilities.invokeLater(() -> {
             doc.setCharacterAttributes(0, text.length(), doc.getStyle("default"), true);
 

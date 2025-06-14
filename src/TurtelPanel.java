@@ -36,6 +36,12 @@ public class TurtelPanel extends JPanel {
         for (Line line : lines) {
             line.draw(g);
         }
+
+        Graphics2D g2 = (Graphics2D) g;
+        g2.translate(turtelPos.x, turtelPos.y);
+        g2.rotate(angel);
+        g2.drawChars(new char[]{'>'}, 0, 1, 0, 0);
+        g2.dispose();
     }
 
     public void move(int length) {

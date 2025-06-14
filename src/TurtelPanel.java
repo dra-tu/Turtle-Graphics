@@ -39,11 +39,15 @@ public class TurtelPanel extends JPanel {
         turtelPos.y = newY;
     }
 
-    public void rotate_right(int dAngel) {
-        angel = (angel + Math.toRadians(dAngel)) % 2*Math.PI;
-    }
-    public void rotate_left(int dAngel) {
-        angel = (angel - Math.toRadians(dAngel)) % 2*Math.PI;
+    public void rotate(String direction, int angelDeg) {
+        switch (direction) {
+            case "R":
+                angel = (angel + Math.toRadians(angelDeg)) % (2*Math.PI);
+                break;
+            case "L":
+                angel = (angel - Math.toRadians(angelDeg)) % (2*Math.PI);
+                break;
+        }
     }
 
     private final static String NEW_LINE = "\n";

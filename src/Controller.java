@@ -7,8 +7,8 @@ public class Controller extends JPanel implements ActionListener {
     private static final String START = "Start";
     private static final String CLEAR = "Clear";
 
-    private JTextArea inputArea;
-    private TurtelPanel turtelPanel;
+    private final JTextArea inputArea;
+    private final TurtelPanel turtelPanel;
 
     public Controller(int width, int height, TurtelPanel turtelPanel) {
         this.turtelPanel = turtelPanel;

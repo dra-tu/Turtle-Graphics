@@ -15,7 +15,7 @@ public class Main {
         draw.moveTurtel(150,100);
         draw.moveTurtel(-250,-35);
 
-        Controller controller = new Controller(MAX_X, 50);
+        Controller controller = new Controller(MAX_X, 50, draw);
         f.add(controller);
 
         f.pack();

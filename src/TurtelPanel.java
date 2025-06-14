@@ -3,8 +3,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class TurtelPanel extends JPanel {
-    private ArrayList<Line> lines;
-    private Point turtelPos;
+    private final ArrayList<Line> lines;
+    private final Point turtelPos;
     private int maxX;
     private int maxY;
 

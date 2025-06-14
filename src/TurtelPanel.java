@@ -14,10 +14,18 @@ public class TurtelPanel extends JPanel {
         maxY = height;
 
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        lines = new ArrayList<>();
-        turtelPos = new Point(maxX / 2, maxY / 2);
-        angel = 0;
         setPreferredSize(new Dimension(maxX, maxY));
+
+        lines = new ArrayList<>();
+        turtelPos = new Point();
+        reset();
+    }
+
+    public void reset() {
+        lines.clear();
+        turtelPos.x = maxX / 2;
+        turtelPos.y = maxY / 2;
+        angel = 0;
     }
 
     @Override

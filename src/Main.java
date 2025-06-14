@@ -12,7 +12,7 @@ public class Main {
         TurtelPanel draw = new TurtelPanel(MAX_X, MAX_Y);
         f.add(draw);
 
-        Controller controller = new Controller(MAX_X, 50, draw);
+        Controller controller = new Controller(MAX_X, 160, draw);
         f.add(controller);
 
         f.pack();

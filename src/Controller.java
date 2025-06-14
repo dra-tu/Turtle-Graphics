@@ -73,9 +73,9 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                     wordEnd--;
                 }
 
-                MutableAttributeSet set = new SimpleAttributeSet();
-                StyleConstants.setForeground(set, Color.RED);
-                StyleConstants.setBackground(set, Color.BLUE);
+                String word = text.substring(wordStard, wordEnd);
+                AttributeSet set = SpecialWords.getStyle(word);
+                set = set != null ? set : doc.getStyle("default");
 
                 doc.setCharacterAttributes(wordStard, wordEnd - wordStard, set, true);
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class TurtelPanel extends JPanel {
     private final ArrayList<Line> lines;
     private final Point turtelPos;
+    private double angel;
     private int maxX;
     private int maxY;
 
@@ -14,7 +15,8 @@ public class TurtelPanel extends JPanel {
 
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         lines = new ArrayList<>();
-        turtelPos = new Point(maxX/2, maxY/2);
+        turtelPos = new Point(maxX / 2, maxY / 2);
+        angel = 0;
         setPreferredSize(new Dimension(maxX, maxY));
     }
 
@@ -27,9 +29,10 @@ public class TurtelPanel extends JPanel {
         }
     }
 
-    public void moveTurtel(int dx, int dy) {
-        int newX = turtelPos.x + dx;
-        int newY = turtelPos.y + dy;
+    public void moveForword(int lenght) {
+        int newX = turtelPos.x + r * Math.cos(angel);
+        int newY = turtelPos.y + r * Math.sin(angel);
+
         lines.add(new Line(turtelPos.x, turtelPos.y, newX, newY));
 
         turtelPos.x = newX;

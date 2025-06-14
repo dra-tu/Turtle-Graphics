@@ -30,8 +30,8 @@ public class TurtelPanel extends JPanel {
     }
 
     public void moveForword(int lenght) {
-        int newX = turtelPos.x + r * Math.cos(angel);
-        int newY = turtelPos.y + r * Math.sin(angel);
+        int newX = (int) (turtelPos.x + lenght * Math.cos(angel));
+        int newY = (int) (turtelPos.y + lenght * Math.sin(angel));
 
         lines.add(new Line(turtelPos.x, turtelPos.y, newX, newY));
 

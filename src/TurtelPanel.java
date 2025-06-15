@@ -10,6 +10,7 @@ public class TurtelPanel extends JPanel {
     private final ArrayList<String> errors;
     private final Point turtelPos;
     private double angel;
+    private long totalLineLenght;
     private int maxX;
     private int maxY;
 
@@ -32,6 +33,7 @@ public class TurtelPanel extends JPanel {
         turtelPos.x = maxX / 2;
         turtelPos.y = maxY / 2;
         angel = 0;
+        totalLineLenght = 0;
     }
 
     private void paintLoop() {
@@ -67,7 +69,9 @@ public class TurtelPanel extends JPanel {
         int newX = (int) Math.round(turtelPos.x + length * Math.cos(angel));
         int newY = (int) Math.round(turtelPos.y + length * Math.sin(angel));
 
-        lines.add(new Line(turtelPos.x, turtelPos.y, newX, newY));
+        Line line = new Line(turtelPos.x, turtelPos.y, newX, newY);
+        lines.add(line);
+        totalLineLenght += line.length();
 
         turtelPos.x = newX;
         turtelPos.y = newY;

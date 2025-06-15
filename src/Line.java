@@ -16,4 +16,8 @@ public class Line {
     public void draw(Graphics g) {
         g.drawLine(x0, y0, x1, y1);
     }
+
+    public long length() {
+        return  Math.round( Math.sqrt( Math.pow((x0-x1), 2) + Math.pow((y0 - y1), 2) ) );
+    }
 }

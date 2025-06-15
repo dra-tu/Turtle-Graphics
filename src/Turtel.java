@@ -1,12 +1,17 @@
 import exeptions.NotAColorException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Turtel extends JPanel implements MouseWheelListener, MouseMotionListener {
     private final static Color DEFAOULT_COLOR = Color.WHITE;
+    private final static int TURTLE_IMG_SIZE = 30;
+    private final static BufferedImage TURTEL_IMG;
 
     private final ArrayList<Line> lines;
     private final Point turtelPos;
@@ -26,6 +31,14 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     public double targetFPS;
 
     private boolean drawing;
+
+    static {
+        try {
+            TURTEL_IMG = ImageIO.read(Turtel.class.getResourceAsStream("turtle.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Turtel(int width, int height) {
         this.setBackground(Color.BLACK);
@@ -94,6 +107,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         g2.translate(viewTranslation.x, viewTranslation.y);
 
+        int lastX = turtelPos.x;
+        int lastY = turtelPos.y;
         // draw Lines
         if (!lines.isEmpty()) {
             long printed = 0L;
@@ -109,23 +124,21 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
                     long diff = toPrintLine - printed;
                     float c = ((float) diff) / ((float) line.length());
 
-                    int newX = Math.round((line.x1() - line.x0()) * c);
-                    int newY = Math.round((line.y1() - line.y0()) * c);
-                    newX += line.x0();
-                    newY += line.y0();
+                    lastX = Math.round((line.x1() - line.x0()) * c) + line.x0();
+                    lastY = Math.round((line.y1() - line.y0()) * c) + line.y0();
 
-                    g.drawLine(line.x0(), line.y0(), newX, newY);
+                    g.drawLine(line.x0(), line.y0(), lastX, lastY);
                     break;
                 }
             }
         }
 
         // draw "turtel"
-        g2.translate(turtelPos.x, turtelPos.y);
+        g2.translate(lastX, lastY);
         g2.rotate(angel);
-        g2.drawChars(new char[]{'>'}, 0, 1, 0, 0);
+        g2.drawImage(TURTEL_IMG, -(TURTLE_IMG_SIZE / 2), -(TURTLE_IMG_SIZE / 2), TURTLE_IMG_SIZE, TURTLE_IMG_SIZE, null);
         g2.rotate(-angel);
-        g2.translate(-turtelPos.x, -turtelPos.y);
+        g2.translate(-lastX, -lastY);
 
         g2.scale(1 / scale, 1 / scale);
     }
@@ -166,6 +179,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     public void setDrawing(boolean drawing) {
         this.drawing = drawing;
     }
+
     public void switchDrawing() {
         this.drawing = !this.drawing;
     }

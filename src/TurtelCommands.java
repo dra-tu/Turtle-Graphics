@@ -14,7 +14,11 @@ public class TurtelCommands {
         this.turtel = turtel;
     }
 
-    private void reset() {
+    public void draw() {
+        turtel.repaint();
+    }
+
+    public void reset() {
         turtel.reset();
         errors.clear();
     }

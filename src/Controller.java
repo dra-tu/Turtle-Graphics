@@ -95,6 +95,8 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                 break;
             case CLEAR:
                 inputArea.setText("");
+                turtelCom.reset();
+                turtelCom.draw();
                 break;
         }
 

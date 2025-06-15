@@ -7,12 +7,17 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Controller extends JPanel implements ActionListener, DocumentListener, ChangeListener {
     private static final String START = "Start";
     private static final String CLEAR = "Clear";
     private static final String DEFAULT = "default";
 
+    private static final Dimension ZERO_DIMENSION = new Dimension(0, 0);
+
+    private final JTextArea errorBox;
+    private final JScrollPane scrollError;
     private final JTextPane inputArea;
     private final TurtelCommands turtelCom;
     private final TurtelAnimationControl turtelAnim;
@@ -35,7 +40,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         }));
         doc.addDocumentListener(this);
         inputArea.setBorder(BorderFactory.createLineBorder(Color.RED));
-        JScrollPane scroll = new JScrollPane(inputArea);
+        JScrollPane scrollInput = new JScrollPane(inputArea);
+
+        // Error Box
+        errorBox = new JTextArea();
+        errorBox.setEditable(false);
+        scrollError = new JScrollPane(errorBox);
+        scrollError.setMaximumSize(ZERO_DIMENSION);
 
         // Buttons
         JButton startButton = new JButton(START);
@@ -71,7 +82,8 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
         this.add(spinnerPanel);
-        this.add(scroll);
+        this.add(scrollError);
+        this.add(scrollInput);
     }
 
     @Override
@@ -85,6 +97,22 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                 inputArea.setText("");
                 break;
         }
+
+        ArrayList<String> errors = turtelCom.getErrors();
+        if (!errors.isEmpty()) {
+            StringBuilder strBuild = new StringBuilder();
+            for (String error : errors) {
+                strBuild.append(error).append("\n");
+            }
+
+            errorBox.setText(strBuild.toString());
+            scrollError.setMaximumSize(null);
+        } else {
+            errorBox.setText("");
+            scrollError.setMaximumSize(ZERO_DIMENSION);
+        }
+
+        revalidate();
     }
 
     @Override

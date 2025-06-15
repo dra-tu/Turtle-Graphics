@@ -19,6 +19,10 @@ public class TurtelCommands {
         errors.clear();
     }
 
+    public ArrayList<String> getErrors() {
+        return errors;
+    }
+
     private enum ErrorType {
         ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN, NO_COLOR,
     }

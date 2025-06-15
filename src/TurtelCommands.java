@@ -1,133 +1,19 @@
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TurtelPanel extends JPanel {
+public class TurtelCommands {
     private static final String MAIN_FUN_NAME = "MAIN";
-
-    private final ArrayList<Line> lines;
     private final ArrayList<String> errors;
-    private final Point turtelPos;
-    private double angel;
-    private long totalLineLength;
-    private long toPrintLine;
-    private int maxX;
-    private int maxY;
+    private final Turtel turtel;
 
-    public TurtelPanel(int width, int height) {
-        maxX = width;
-        maxY = height;
-
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        setPreferredSize(new Dimension(maxX, maxY));
-
-        lines = new ArrayList<>();
+    public TurtelCommands(Turtel turtel) {
         errors = new ArrayList<>();
-        turtelPos = new Point();
-        reset();
+        this.turtel = turtel;
     }
 
-    public void reset() {
-        lines.clear();
+    private void reset() {
+        turtel.reset();
         errors.clear();
-        turtelPos.x = maxX / 2;
-        turtelPos.y = maxY / 2;
-        angel = 0;
-        totalLineLength = 0L;
-    }
-
-    private void paintLoop() {
-        Thread t = new Thread(() -> {
-            toPrintLine = 0L;
-
-            double drawInterval = 1_000_000_000.0/120.0;
-            double delta = 0.0;
-            long lastTime = System.nanoTime();
-            long currentTime;
-
-            while (toPrintLine < totalLineLength) {
-                currentTime = System.nanoTime();
-                delta += (currentTime - lastTime) / drawInterval;
-                lastTime = currentTime;
-
-                if (delta >= 1) {
-                    repaint();
-                    toPrintLine = Math.min(toPrintLine + 10L, totalLineLength);
-                    delta--;
-                }
-            }
-        });
-
-        t.start();
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        // draw Lines
-        if (!lines.isEmpty()) {
-            long printed = 0L;
-            int i = 0;
-            while (printed < toPrintLine) {
-                Line line = lines.get(i);
-                if ((line.length() + printed) <= toPrintLine) {
-                    line.draw(g);
-                    printed += line.length();
-                    i++;
-                } else {
-                    long diff = toPrintLine - printed;
-                    float c = ((float) diff) / ((float) line.length());
-
-                    int newX = Math.round((line.x1 - line.x0) * c);
-                    int newY = Math.round((line.y1 - line.y0) * c);
-                    newX += line.x0;
-                    newY += line.y0;
-
-                    g.drawLine(line.x0, line.y0, newX, newY);
-                    break;
-                }
-            }
-        }
-
-        // draw "turtel"
-        Graphics2D g2 = (Graphics2D) g;
-        g2.translate(turtelPos.x, turtelPos.y);
-        g2.rotate(angel);
-        g2.drawChars(new char[]{'>'}, 0, 1, 0, 0);
-        g2.rotate(-angel);
-        g2.translate(-turtelPos.x, -turtelPos.y);
-
-        // print errors
-        g.setColor(Color.RED);
-        for (int j = 0; j < errors.size(); j++) {
-            g.drawString(errors.get(j), 0, (j + 1) * 20);
-        }
-//        g.setColor(Color.BLACK);
-    }
-
-    public void move(int length) {
-        int newX = (int) Math.round(turtelPos.x + length * Math.cos(angel));
-        int newY = (int) Math.round(turtelPos.y + length * Math.sin(angel));
-
-        Line line = new Line(turtelPos.x, turtelPos.y, newX, newY);
-        lines.add(line);
-        totalLineLength += line.length();
-
-        turtelPos.x = newX;
-        turtelPos.y = newY;
-    }
-
-    public void rotate(String direction, int angelDeg) {
-        switch (direction) {
-            case "R":
-                angel = (angel + Math.toRadians(angelDeg)) % (2 * Math.PI);
-                break;
-            case "L":
-                angel = (angel - Math.toRadians(angelDeg)) % (2 * Math.PI);
-                break;
-        }
     }
 
     private enum ErrorType {
@@ -215,7 +101,7 @@ public class TurtelPanel extends JPanel {
         executeCommands(commandList, true, MAIN_FUN_NAME, values, funMap, funValues);
     }
 
-    public void executeCommands(
+    private void executeCommands(
             String commandList,
             boolean reset,
             String currentFun,
@@ -260,7 +146,7 @@ public class TurtelPanel extends JPanel {
                             continue;
                         }
                         int length = parse(values, funValues, args[0]);
-                        move(length);
+                        turtel.move(length);
                         break;
                     case "ROTATE":
                         if (args.length != 2) {
@@ -268,7 +154,7 @@ public class TurtelPanel extends JPanel {
                             continue;
                         }
                         int angel = parse(values, funValues, args[1]);
-                        rotate(args[0], angel);
+                        turtel.rotate(args[0], angel);
                         break;
 
                     case "VAL":
@@ -348,6 +234,6 @@ public class TurtelPanel extends JPanel {
             }
         }
 
-        if (reset) paintLoop();
+        if (reset) turtel.start();
     }
 }

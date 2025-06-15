@@ -12,11 +12,11 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private static final String DEFAULT = "default";
 
     private final JTextPane inputArea;
-    private final TurtelPanel turtelPanel;
+    private final TurtelCommands turtel;
     private final StyledDocument doc;
 
-    public Controller(int width, int height, TurtelPanel turtelPanel) {
-        this.turtelPanel = turtelPanel;
+    public Controller(int width, int height, TurtelCommands turtel) {
+        this.turtel = turtel;
 
         inputArea = new JTextPane();
         doc = inputArea.getStyledDocument();
@@ -50,7 +50,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         JButton button = (JButton) e.getSource();
         switch (button.getText()) {
             case START:
-                turtelPanel.executeCommands(inputArea.getText());
+                turtel.executeCommands(inputArea.getText());
                 break;
             case CLEAR:
                 inputArea.setText("");

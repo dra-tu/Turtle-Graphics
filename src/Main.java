@@ -5,14 +5,15 @@ public class Main {
     private static final int MAX_Y = 500;
 
     public static void main(String[] args) {
-        JFrame f = new JFrame("Swing Paint Demo");
-        f.setLayout(new BoxLayout(f.getContentPane(), BoxLayout.Y_AXIS));
+        JFrame f = new JFrame("Turtel");
+        f.setLayout(new BoxLayout(f.getContentPane(), BoxLayout.X_AXIS));
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        TurtelPanel draw = new TurtelPanel(MAX_X, MAX_Y);
-        f.add(draw);
+        Turtel turtel = new Turtel(MAX_X, MAX_Y);
+        TurtelCommands turtelCommands = new TurtelCommands(turtel);
+        f.add(turtel);
 
-        Controller controller = new Controller(MAX_X, 160, draw);
+        Controller controller = new Controller(MAX_X, 160, turtelCommands);
         f.add(controller);
 
         f.pack();

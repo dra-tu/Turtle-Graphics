@@ -7,11 +7,12 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Turtel extends JPanel implements MouseWheelListener, MouseMotionListener {
     private final static Color DEFAOULT_COLOR = Color.WHITE;
     private final static int TURTLE_IMG_SIZE = 30;
-    private final static BufferedImage TURTEL_IMG;
+    public final static BufferedImage TURTEL_IMG;
 
     private final ArrayList<Line> lines;
     private final Point turtelPos;
@@ -34,8 +35,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
     static {
         try {
-            TURTEL_IMG = ImageIO.read(Turtel.class.getResourceAsStream("turtle.png"));
-        } catch (IOException e) {
+            TURTEL_IMG = ImageIO.read(Objects.requireNonNull(Turtel.class.getResourceAsStream("turtle.png")));
+        } catch (IOException | NullPointerException e) {
             throw new RuntimeException(e);
         }
     }

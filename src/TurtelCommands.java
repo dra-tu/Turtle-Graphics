@@ -1,3 +1,4 @@
+import exeptions.NoCompOperatorException;
 import exeptions.NotAColorException;
 
 import java.util.ArrayList;
@@ -52,9 +53,6 @@ public class TurtelCommands {
                 errors.add("This is not a color at line " + line + " of " + funName);
                 break;
         }
-    }
-
-    private static class NoCompOperatorException extends RuntimeException {
     }
 
     private boolean parseIf(int a, int b, String op) throws NoCompOperatorException {

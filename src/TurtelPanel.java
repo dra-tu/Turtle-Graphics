@@ -52,15 +52,15 @@ public class TurtelPanel extends JPanel {
         g2.translate(turtelPos.x, turtelPos.y);
         g2.rotate(angel);
         g2.drawChars(new char[]{'>'}, 0, 1, 0, 0);
-        g2.translate(-turtelPos.x, -turtelPos.y);
         g2.rotate(-angel);
+        g2.translate(-turtelPos.x, -turtelPos.y);
 
         // print errors
-        if (errors.isEmpty()) return;
         g.setColor(Color.RED);
         for (int i = 0; i < errors.size(); i++) {
             g.drawString(errors.get(i), 0, (i + 1) * 20);
         }
+//        g.setColor(Color.BLACK);
     }
 
     public void move(int length) {

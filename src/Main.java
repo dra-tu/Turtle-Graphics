@@ -18,7 +18,6 @@ public class Main {
         f.add(turtel);
 
         f.pack();
-        f.setResizable(false);
         f.setVisible(true);
     }
 }

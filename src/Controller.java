@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 public class Controller extends JPanel implements ActionListener, DocumentListener {
     private static final String START = "Start";
     private static final String CLEAR = "Clear";
+    private static final String DEFAULT = "default";
 
     private final JTextPane inputArea;
     private final TurtelPanel turtelPanel;
@@ -19,6 +20,11 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
         inputArea = new JTextPane();
         doc = inputArea.getStyledDocument();
+        int tapWidth = inputArea.getFontMetrics( inputArea.getFont() ).charWidth(' ') * 4;
+        Style defStyle = doc.getStyle(DEFAULT);
+        StyleConstants.setTabSet(defStyle, new TabSet(new TabStop[]{
+                new TabStop(tapWidth),
+        }));
         doc.addDocumentListener(this);
         inputArea.setBorder(BorderFactory.createLineBorder(Color.RED));
 
@@ -55,7 +61,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private void highlight() {
         String text = inputArea.getText().replace("\n", "");
         SwingUtilities.invokeLater(() -> {
-            doc.setCharacterAttributes(0, text.length(), doc.getStyle("default"), true);
+            doc.setCharacterAttributes(0, text.length(), doc.getStyle(DEFAULT), true);
 
             int wordStard = 0;
             int wordEnd = 0;
@@ -75,7 +81,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
                 String word = text.substring(wordStard, wordEnd);
                 AttributeSet set = SpecialWords.getStyle(word);
-                set = set != null ? set : doc.getStyle("default");
+                set = set != null ? set : doc.getStyle(DEFAULT);
 
                 doc.setCharacterAttributes(wordStard, wordEnd - wordStard, set, true);
 

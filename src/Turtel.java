@@ -1,10 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Turtel extends JPanel implements MouseWheelListener {
+public class Turtel extends JPanel implements MouseWheelListener, MouseMotionListener {
     private final ArrayList<Line> lines;
     private final Point turtelPos;
     private double angel;
@@ -13,18 +12,28 @@ public class Turtel extends JPanel implements MouseWheelListener {
     private int maxX;
     private int maxY;
 
+    private int centerX;
+    private int centerY;
+
+    private long lastDragTime;
+    private Point lastDragPoint;
+    private final Point viewTranslation;
+
     private double scale;
 
     public Turtel(int width, int height) {
         this.addMouseWheelListener(this);
+        this.addMouseMotionListener(this);
         scale = 1;
 
         maxX = width;
         maxY = height;
+        centerX = maxX/2;
+        centerY = maxY/2;
 
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setPreferredSize(new Dimension(maxX, maxY));
 
+        viewTranslation = new Point(0, 0);
         lines = new ArrayList<>();
         turtelPos = new Point();
         reset();
@@ -68,7 +77,13 @@ public class Turtel extends JPanel implements MouseWheelListener {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.scale(scale,  scale);
+        g2.translate(centerX, centerY);
+        g2.scale(scale, scale);
+        g2.translate(-centerX, -centerY);
+
+        if (viewTranslation != null) {
+            g2.translate(viewTranslation.x, viewTranslation.y);
+        }
 
         // draw Lines
         if (!lines.isEmpty()) {
@@ -132,7 +147,31 @@ public class Turtel extends JPanel implements MouseWheelListener {
     public void mouseWheelMoved(MouseWheelEvent e) {
         int upDown = e.getWheelRotation();
         double factor = upDown * 0.1;
-        scale += factor;
+        scale = Math.clamp(scale - factor, 0.1, 5.0);
         repaint();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        // 100ms = 0.1s
+        if (lastDragPoint == null || (System.currentTimeMillis() - lastDragTime) >= 100L ) {
+            lastDragPoint = e.getPoint();
+            lastDragTime = System.currentTimeMillis();
+            return;
+        }
+
+        Point thisPoint = e.getPoint();
+
+        viewTranslation.x += (int) Math.round((thisPoint.x - lastDragPoint.x) * (1/scale));
+        viewTranslation.y += (int) Math.round((thisPoint.y - lastDragPoint.y) * (1/scale));
+
+        lastDragPoint = thisPoint;
+        lastDragTime = System.currentTimeMillis();
+
+        repaint();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
     }
 }

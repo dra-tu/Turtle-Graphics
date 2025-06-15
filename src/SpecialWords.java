@@ -6,9 +6,9 @@ import java.awt.*;
 import java.util.Objects;
 
 public class SpecialWords {
-    private static String[] KeyWords = {"MOVE", "ROTATE", "VAL", "CALL-IF", "FUN", "END", "CALL", "COLOR"};
+    private static final String[] KEY_WORDS = {"MOVE", "ROTATE", "VAL", "CALL-IF", "FUN", "END", "CALL", "COLOR"};
 
-    private static String[] ValModifiers = {"CALC"};
+    private static final String[] VAL_MODIFIERS = {"CALC"};
 
     private final static MutableAttributeSet KEY_WORD_STYLE;
     private final static MutableAttributeSet VAL_MOD_STYLE;
@@ -24,13 +24,13 @@ public class SpecialWords {
     }
 
     public static AttributeSet getStyle(String word) {
-        for (String keyWord : KeyWords) {
+        for (String keyWord : KEY_WORDS) {
             if (Objects.equals(word, keyWord)) {
                 return KEY_WORD_STYLE;
             }
         }
 
-        for (String modifier : ValModifiers) {
+        for (String modifier : VAL_MODIFIERS) {
             if (word.equals(modifier)) {
                 return VAL_MOD_STYLE;
             }

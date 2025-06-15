@@ -129,6 +129,7 @@ public class TurtelCommands {
             String[] command = commands[i].split(" ", 2);
 
             if (inFun && !command[0].equals("END") && !command[0].equals("FUN")) {
+                assert funBody != null;
                 funBody.append(commands[i]).append("\n");
                 continue;
             }
@@ -205,6 +206,7 @@ public class TurtelCommands {
                             continue;
                         }
                         inFun = false;
+                        assert funBody != null;
                         funMap.put(funName, new Function(funArgsNames, funBody.toString()));
                         break;
                     case "CALL-IF":

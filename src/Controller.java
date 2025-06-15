@@ -15,15 +15,15 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
     private final JTextPane inputArea;
     private final TurtelCommands turtelCom;
-    private final TurtelAnimationControll turtelAnim;
+    private final TurtelAnimationControl turtelAnim;
     private final StyledDocument doc;
 
-    private final JSpinner spinerFPS;
+    private final JSpinner spinnerFPS;
     private final JSpinner spinnerStep;
 
     public Controller(int width, Turtel turtel) {
         this.turtelCom = new TurtelCommands(turtel);
-        this.turtelAnim = new TurtelAnimationControll(turtel);
+        this.turtelAnim = new TurtelAnimationControl(turtel);
 
         // input Area
         inputArea = new JTextPane();
@@ -54,13 +54,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         // Number input
         SpinnerNumberModel modelFPS = new SpinnerNumberModel(turtel.targetFPS, 1, Integer.MAX_VALUE, 1);
         SpinnerNumberModel modelStep = new SpinnerNumberModel(turtel.stepLength, 1, Integer.MAX_VALUE, 1);
-        spinerFPS = new JSpinner(modelFPS);
+        spinnerFPS = new JSpinner(modelFPS);
         spinnerStep = new JSpinner(modelStep);
-        spinerFPS.addChangeListener(this);
+        spinnerFPS.addChangeListener(this);
         spinnerStep.addChangeListener(this);
 
         JPanel spinnerPanel = new JPanel();
-        spinnerPanel.add(spinerFPS);
+        spinnerPanel.add(spinnerFPS);
         spinnerPanel.add(spinnerStep);
         d = new Dimension(width, 75);
         spinnerPanel.setMaximumSize(d);
@@ -93,10 +93,10 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
         Number num = (Number) sp.getValue();
 
-        if (sp == spinerFPS) {
-            turtelAnim.setTartgetFPS(num.doubleValue());
+        if (sp == spinnerFPS) {
+            turtelAnim.setTargetFPS(num.doubleValue());
         } else if (sp == spinnerStep) {
-            turtelAnim.setStepLenght(num.longValue());
+            turtelAnim.setStepLength(num.longValue());
         }
     }
 
@@ -105,14 +105,14 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         SwingUtilities.invokeLater(() -> {
             doc.setCharacterAttributes(0, text.length(), doc.getStyle(DEFAULT), true);
 
-            int wordStard = 0;
+            int wordStart = 0;
             int wordEnd = 0;
             for (int i = 0; i < text.length(); i++) {
                 wordEnd++;
 
                 if (!Character.isWhitespace(text.charAt(i)) && i != text.length() - 1) continue;
-                if (wordStard == wordEnd) {
-                    wordStard = i + 1;
+                if (wordStart == wordEnd) {
+                    wordStart = i + 1;
                     wordEnd = i + 1;
                 }
                 if (wordEnd != text.length()) {
@@ -121,13 +121,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                     wordEnd--;
                 }
 
-                String word = text.substring(wordStard, wordEnd);
+                String word = text.substring(wordStart, wordEnd);
                 AttributeSet set = SpecialWords.getStyle(word);
                 set = set != null ? set : doc.getStyle(DEFAULT);
 
-                doc.setCharacterAttributes(wordStard, wordEnd - wordStard, set, true);
+                doc.setCharacterAttributes(wordStart, wordEnd - wordStart, set, true);
 
-                wordStard = i + 1;
+                wordStart = i + 1;
                 wordEnd = i + 1;
             }
         });

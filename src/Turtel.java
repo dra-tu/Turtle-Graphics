@@ -14,8 +14,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     private Color lineColor;
     private long totalLineLength;
     private long toPrintLine;
-    private int maxX;
-    private int maxY;
+    private final int START_X;
+    private final int START_Y;
 
     private long lastDragTime;
     private Point lastDragPoint;
@@ -32,13 +32,13 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         this.addMouseMotionListener(this);
         scale = 1;
 
-        maxX = width;
-        maxY = height;
+        START_X = width / 2;
+        START_Y = height / 2;
 
         stepLength = 10L;
         targetFPS = 120.0;
 
-        setPreferredSize(new Dimension(maxX, maxY));
+        setPreferredSize(new Dimension(width, height));
 
         lineColor = DEFAOULT_COLOR;
         viewTranslation = new Point(0, 0);
@@ -49,8 +49,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
     public void reset() {
         lines.clear();
-        turtelPos.x = maxX / 2;
-        turtelPos.y = maxY / 2;
+        turtelPos.x = START_X;
+        turtelPos.y = START_Y;
         angel = 0;
         totalLineLength = 0L;
         lineColor = DEFAOULT_COLOR;
@@ -96,7 +96,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
             int i = 0;
             while (printed < toPrintLine) {
                 Line line = lines.get(i);
-                g2.setColor(line.color);
+                g2.setColor(line.color());
                 if ((line.length() + printed) <= toPrintLine) {
                     line.draw(g);
                     printed += line.length();
@@ -105,12 +105,12 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
                     long diff = toPrintLine - printed;
                     float c = ((float) diff) / ((float) line.length());
 
-                    int newX = Math.round((line.x1 - line.x0) * c);
-                    int newY = Math.round((line.y1 - line.y0) * c);
-                    newX += line.x0;
-                    newY += line.y0;
+                    int newX = Math.round((line.x1() - line.x0()) * c);
+                    int newY = Math.round((line.y1() - line.y0()) * c);
+                    newX += line.x0();
+                    newY += line.y0();
 
-                    g.drawLine(line.x0, line.y0, newX, newY);
+                    g.drawLine(line.x0(), line.y0(), newX, newY);
                     break;
                 }
             }

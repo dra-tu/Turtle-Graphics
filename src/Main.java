@@ -10,7 +10,6 @@ public class Main {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Turtel turtel = new Turtel(MAX_X, MAX_Y);
-        TurtelCommands turtelCommands = new TurtelCommands(turtel);
 
         Controller controller = new Controller(MAX_X, turtel);
 

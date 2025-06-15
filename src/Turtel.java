@@ -17,9 +17,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     private int maxX;
     private int maxY;
 
-    private int centerX;
-    private int centerY;
-
     private long lastDragTime;
     private Point lastDragPoint;
     private final Point viewTranslation;
@@ -35,8 +32,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         maxX = width;
         maxY = height;
-        centerX = maxX / 2;
-        centerY = maxY / 2;
 
         setPreferredSize(new Dimension(maxX, maxY));
 
@@ -86,13 +81,9 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.translate(centerX, centerY);
         g2.scale(scale, scale);
-        g2.translate(-centerX, -centerY);
 
-        if (viewTranslation != null) {
-            g2.translate(viewTranslation.x, viewTranslation.y);
-        }
+        g2.translate(viewTranslation.x, viewTranslation.y);
 
         // draw Lines
         if (!lines.isEmpty()) {

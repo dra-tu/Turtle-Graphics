@@ -296,6 +296,6 @@ public class TurtelPanel extends JPanel {
             }
         }
 
-        repaint();
+        if (reset) repaint();
     }
 }

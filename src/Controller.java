@@ -34,15 +34,18 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         clearButton.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.add(startButton);
         buttonPanel.add(clearButton);
+        Dimension d = startButton.getSize();
+        d.width = width;
+        buttonPanel.setMaximumSize(d);
+        buttonPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
         JScrollPane scroll = new JScrollPane(inputArea);
-        scroll.setPreferredSize(new Dimension(width, height));
 
-        this.add(scroll);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
+        this.add(scroll);
     }
 
     @Override

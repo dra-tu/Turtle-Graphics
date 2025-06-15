@@ -11,10 +11,11 @@ public class Main {
 
         Turtel turtel = new Turtel(MAX_X, MAX_Y);
         TurtelCommands turtelCommands = new TurtelCommands(turtel);
-        f.add(turtel);
 
-        Controller controller = new Controller(MAX_X, 160, turtelCommands);
+        Controller controller = new Controller(MAX_X, MAX_Y, turtelCommands);
+
         f.add(controller);
+        f.add(turtel);
 
         f.pack();
         f.setResizable(false);

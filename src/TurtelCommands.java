@@ -1,3 +1,5 @@
+import exeptions.NotAColorException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,7 +19,7 @@ public class TurtelCommands {
     }
 
     private enum ErrorType {
-        ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN,
+        ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN, NO_COLOR,
     }
 
     private void addError(ErrorType e, int line, String funName) {
@@ -45,6 +47,10 @@ public class TurtelCommands {
                 break;
             case MAIN_FUN:
                 errors.add("FUN with name " + MAIN_FUN_NAME + " is not allowed at line " + line);
+                break;
+            case NO_COLOR:
+                errors.add("This is not a color at line " + line + " of " + funName);
+                break;
         }
     }
 
@@ -156,6 +162,17 @@ public class TurtelCommands {
                         int angel = parse(values, funValues, args[1]);
                         turtel.rotate(args[0], angel);
                         break;
+                    case "COLOR":
+                        if (args.length != 3) {
+                            addError(ErrorType.ARG_NUM, i, currentFun);
+                            continue;
+                        }
+                        int r = parse(values, funValues, args[0]);
+                        int g = parse(values, funValues, args[1]);
+                        int b = parse(values, funValues, args[2]);
+
+                        turtel.setColor(r, g, b);
+                        break;
 
                     case "VAL":
                         if (args.length != 2) {
@@ -202,9 +219,9 @@ public class TurtelCommands {
                             addError(ErrorType.COMP_FALSELY_FORMAT, i, currentFun);
                             continue;
                         }
-                        int a = parse(values, funValues, split[0]);
-                        int b = parse(values, funValues, split[2]);
-                        boolean result = parseIf(a, b, split[1]);
+                        int left = parse(values, funValues, split[0]);
+                        int right = parse(values, funValues, split[2]);
+                        boolean result = parseIf(left, right, split[1]);
 
                         if (!result) continue;
                         arg_offset = 1;
@@ -231,6 +248,8 @@ public class TurtelCommands {
                 addError(ErrorType.NOT_A_NUM, i, funName);
             } catch (NoCompOperatorException ignored) {
                 addError(ErrorType.UNKNOWN_COMP, i, funName);
+            } catch (NotAColorException ignored) {
+                addError(ErrorType.NO_COLOR, i, funName);
             }
         }
 

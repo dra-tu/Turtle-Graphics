@@ -1,12 +1,17 @@
+import exeptions.NotAColorException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Turtel extends JPanel implements MouseWheelListener, MouseMotionListener {
+    private final static Color DEFAOULT_COLOR = Color.WHITE;
+
     private final ArrayList<Line> lines;
     private final Point turtelPos;
     private double angel;
+    private Color lineColor;
     private long totalLineLength;
     private long toPrintLine;
     private int maxX;
@@ -22,17 +27,20 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     private double scale;
 
     public Turtel(int width, int height) {
+        this.setBackground(Color.BLACK);
+
         this.addMouseWheelListener(this);
         this.addMouseMotionListener(this);
         scale = 1;
 
         maxX = width;
         maxY = height;
-        centerX = maxX/2;
-        centerY = maxY/2;
+        centerX = maxX / 2;
+        centerY = maxY / 2;
 
         setPreferredSize(new Dimension(maxX, maxY));
 
+        lineColor = DEFAOULT_COLOR;
         viewTranslation = new Point(0, 0);
         lines = new ArrayList<>();
         turtelPos = new Point();
@@ -45,13 +53,14 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         turtelPos.y = maxY / 2;
         angel = 0;
         totalLineLength = 0L;
+        lineColor = DEFAOULT_COLOR;
     }
 
     public void start() {
         Thread t = new Thread(() -> {
             toPrintLine = 0L;
 
-            double drawInterval = 1_000_000_000.0/120.0;
+            double drawInterval = 1_000_000_000.0 / 120.0;
             double delta = 0.0;
             long lastTime = System.nanoTime();
             long currentTime;
@@ -91,6 +100,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
             int i = 0;
             while (printed < toPrintLine) {
                 Line line = lines.get(i);
+                g2.setColor(line.color);
                 if ((line.length() + printed) <= toPrintLine) {
                     line.draw(g);
                     printed += line.length();
@@ -117,14 +127,14 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         g2.rotate(-angel);
         g2.translate(-turtelPos.x, -turtelPos.y);
 
-        g2.scale(1/scale, 1/scale);
+        g2.scale(1 / scale, 1 / scale);
     }
 
     public void move(int length) {
         int newX = (int) Math.round(turtelPos.x + length * Math.cos(angel));
         int newY = (int) Math.round(turtelPos.y + length * Math.sin(angel));
 
-        Line line = new Line(turtelPos.x, turtelPos.y, newX, newY);
+        Line line = new Line(turtelPos.x, turtelPos.y, newX, newY, lineColor);
         lines.add(line);
         totalLineLength += line.length();
 
@@ -143,6 +153,14 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         }
     }
 
+    public void setColor(int r, int g, int b) throws NotAColorException {
+        try {
+            lineColor = new Color(r, g, b);
+        } catch (IllegalArgumentException ig) {
+            throw new NotAColorException();
+        }
+    }
+
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int upDown = e.getWheelRotation();
@@ -154,7 +172,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     @Override
     public void mouseDragged(MouseEvent e) {
         // 100ms = 0.1s
-        if (lastDragPoint == null || (System.currentTimeMillis() - lastDragTime) >= 100L ) {
+        if (lastDragPoint == null || (System.currentTimeMillis() - lastDragTime) >= 100L) {
             lastDragPoint = e.getPoint();
             lastDragTime = System.currentTimeMillis();
             return;
@@ -162,8 +180,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         Point thisPoint = e.getPoint();
 
-        viewTranslation.x += (int) Math.round((thisPoint.x - lastDragPoint.x) * (1/scale));
-        viewTranslation.y += (int) Math.round((thisPoint.y - lastDragPoint.y) * (1/scale));
+        viewTranslation.x += (int) Math.round((thisPoint.x - lastDragPoint.x) * (1 / scale));
+        viewTranslation.y += (int) Math.round((thisPoint.y - lastDragPoint.y) * (1 / scale));
 
         lastDragPoint = thisPoint;
         lastDragTime = System.currentTimeMillis();

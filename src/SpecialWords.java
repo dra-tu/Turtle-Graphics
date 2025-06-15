@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.Objects;
 
 public class SpecialWords {
-    private static String[] KeyWords = {"MOVE", "ROTATE", "VAL", "CALL-IF", "FUN", "END", "CALL"};
+    private static String[] KeyWords = {"MOVE", "ROTATE", "VAL", "CALL-IF", "FUN", "END", "CALL", "COLOR"};
 
     private static String[] ValModifiers = {"CALC"};
 

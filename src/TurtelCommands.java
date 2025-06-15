@@ -176,6 +176,15 @@ public class TurtelCommands {
 
                         turtel.setColor(r, g, b);
                         break;
+                    case "PEN_UP":
+                        turtel.setDrawing(false);
+                        break;
+                    case "PEN_DOWN":
+                        turtel.setDrawing(true);
+                        break;
+                    case "PEN_SWITCH":
+                        turtel.switchDrawing();
+                        break;
 
                     case "VAL":
                         if (args.length != 2) {
@@ -213,7 +222,7 @@ public class TurtelCommands {
                         assert funBody != null;
                         funMap.put(funName, new Function(funArgsNames, funBody.toString()));
                         break;
-                    case "CALL-IF":
+                    case "CALL_IF":
                         if (args.length < 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
                             continue;

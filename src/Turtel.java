@@ -25,6 +25,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     public long stepLength;
     public double targetFPS;
 
+    private boolean drawing;
+
     public Turtel(int width, int height) {
         this.setBackground(Color.BLACK);
 
@@ -37,6 +39,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         stepLength = 10L;
         targetFPS = 120.0;
+
+        drawing = true;
 
         setPreferredSize(new Dimension(width, height));
 
@@ -130,9 +134,11 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         int newX = (int) Math.round(turtelPos.x + length * Math.cos(angel));
         int newY = (int) Math.round(turtelPos.y + length * Math.sin(angel));
 
-        Line line = new Line(turtelPos.x, turtelPos.y, newX, newY, lineColor);
-        lines.add(line);
-        totalLineLength += line.length();
+        if (drawing) {
+            Line line = new Line(turtelPos.x, turtelPos.y, newX, newY, lineColor);
+            lines.add(line);
+            totalLineLength += line.length();
+        }
 
         turtelPos.x = newX;
         turtelPos.y = newY;
@@ -155,6 +161,13 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         } catch (IllegalArgumentException ig) {
             throw new NotAColorException();
         }
+    }
+
+    public void setDrawing(boolean drawing) {
+        this.drawing = drawing;
+    }
+    public void switchDrawing() {
+        this.drawing = !this.drawing;
     }
 
     @Override

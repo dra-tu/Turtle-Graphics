@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
@@ -6,18 +8,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Controller extends JPanel implements ActionListener, DocumentListener {
+public class Controller extends JPanel implements ActionListener, DocumentListener, ChangeListener {
     private static final String START = "Start";
     private static final String CLEAR = "Clear";
     private static final String DEFAULT = "default";
 
     private final JTextPane inputArea;
-    private final TurtelCommands turtel;
+    private final TurtelCommands turtelCom;
+    private final TurtelAnimationControll turtelAnim;
     private final StyledDocument doc;
 
-    public Controller(int width, int height, TurtelCommands turtel) {
-        this.turtel = turtel;
+    private final JSpinner spinerFPS;
+    private final JSpinner spinnerStep;
 
+    public Controller(int width, Turtel turtel) {
+        this.turtelCom = new TurtelCommands(turtel);
+        this.turtelAnim = new TurtelAnimationControll(turtel);
+
+        // input Area
         inputArea = new JTextPane();
         doc = inputArea.getStyledDocument();
         int tapWidth = inputArea.getFontMetrics( inputArea.getFont() ).charWidth(' ') * 4;
@@ -27,7 +35,9 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         }));
         doc.addDocumentListener(this);
         inputArea.setBorder(BorderFactory.createLineBorder(Color.RED));
+        JScrollPane scroll = new JScrollPane(inputArea);
 
+        // Buttons
         JButton startButton = new JButton(START);
         JButton clearButton = new JButton(CLEAR);
         startButton.addActionListener(this);
@@ -41,10 +51,26 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         buttonPanel.setMaximumSize(d);
         buttonPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
-        JScrollPane scroll = new JScrollPane(inputArea);
+        // Number input
+        SpinnerNumberModel modelFPS = new SpinnerNumberModel(turtel.targetFPS, 1, Integer.MAX_VALUE, 1);
+        SpinnerNumberModel modelStep = new SpinnerNumberModel(turtel.stepLength, 1, Integer.MAX_VALUE, 1);
+        spinerFPS = new JSpinner(modelFPS);
+        spinnerStep = new JSpinner(modelStep);
+        spinerFPS.addChangeListener(this);
+        spinnerStep.addChangeListener(this);
 
+        JPanel spinnerPanel = new JPanel();
+        spinnerPanel.add(spinerFPS);
+        spinnerPanel.add(spinnerStep);
+        d = new Dimension(width, 400);
+        spinnerPanel.setMaximumSize(d);
+        spinnerPanel.setMinimumSize(d);
+        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
+
+        // finish
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
+        this.add(spinnerPanel);
         this.add(scroll);
     }
 
@@ -53,11 +79,24 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         JButton button = (JButton) e.getSource();
         switch (button.getText()) {
             case START:
-                turtel.executeCommands(inputArea.getText());
+                turtelCom.executeCommands(inputArea.getText());
                 break;
             case CLEAR:
                 inputArea.setText("");
                 break;
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        JSpinner sp = (JSpinner) e.getSource();
+
+        Number num = (Number) sp.getValue();
+
+        if (sp == spinerFPS) {
+            turtelAnim.setTartgetFPS(num.doubleValue());
+        } else if (sp == spinnerStep) {
+            turtelAnim.setStepLenght(num.longValue());
         }
     }
 

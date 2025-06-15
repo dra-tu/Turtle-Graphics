@@ -22,6 +22,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     private final Point viewTranslation;
 
     private double scale;
+    public long stepLength;
+    public double targetFPS;
 
     public Turtel(int width, int height) {
         this.setBackground(Color.BLACK);
@@ -32,6 +34,9 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         maxX = width;
         maxY = height;
+
+        stepLength = 10L;
+        targetFPS = 120.0;
 
         setPreferredSize(new Dimension(maxX, maxY));
 
@@ -55,19 +60,19 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         Thread t = new Thread(() -> {
             toPrintLine = 0L;
 
-            double drawInterval = 1_000_000_000.0 / 120.0;
             double delta = 0.0;
             long lastTime = System.nanoTime();
             long currentTime;
 
             while (toPrintLine < totalLineLength) {
+                double drawInterval = 1_000_000_000.0 / targetFPS;
                 currentTime = System.nanoTime();
                 delta += (currentTime - lastTime) / drawInterval;
                 lastTime = currentTime;
 
                 if (delta >= 1) {
                     repaint();
-                    toPrintLine = Math.min(toPrintLine + 10L, totalLineLength);
+                    toPrintLine = Math.min(toPrintLine + stepLength, totalLineLength);
                     delta--;
                 }
             }

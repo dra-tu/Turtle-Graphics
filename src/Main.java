@@ -12,7 +12,7 @@ public class Main {
         Turtel turtel = new Turtel(MAX_X, MAX_Y);
         TurtelCommands turtelCommands = new TurtelCommands(turtel);
 
-        Controller controller = new Controller(MAX_X, MAX_Y, turtelCommands);
+        Controller controller = new Controller(MAX_X, turtel);
 
         f.add(controller);
         f.add(turtel);

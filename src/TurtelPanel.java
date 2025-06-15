@@ -34,6 +34,10 @@ public class TurtelPanel extends JPanel {
         angel = 0;
     }
 
+    private void paintLoop() {
+        repaint();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -296,6 +300,6 @@ public class TurtelPanel extends JPanel {
             }
         }
 
-        if (reset) repaint();
+        if (reset) paintLoop();
     }
 }

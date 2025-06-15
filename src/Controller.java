@@ -62,7 +62,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         JPanel spinnerPanel = new JPanel();
         spinnerPanel.add(spinerFPS);
         spinnerPanel.add(spinnerStep);
-        d = new Dimension(width, 400);
+        d = new Dimension(width, 75);
         spinnerPanel.setMaximumSize(d);
         spinnerPanel.setMinimumSize(d);
         spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));

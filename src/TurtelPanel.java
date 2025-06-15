@@ -68,7 +68,6 @@ public class TurtelPanel extends JPanel {
 
         // draw Lines
         if (!lines.isEmpty()) {
-            System.out.println("HELLO: " + toPrintLine);
             long printed = 0L;
             int i = 0;
             while (printed < toPrintLine) {
@@ -81,14 +80,15 @@ public class TurtelPanel extends JPanel {
                     long diff = toPrintLine - printed;
                     float c = ((float) diff) / ((float) line.length());
 
-                    int newX = Math.round(line.x0 * c);
-                    int newY = Math.round(line.y0 * c);
+                    int newX = Math.round((line.x1 - line.x0) * c);
+                    int newY = Math.round((line.y1 - line.y0) * c);
+                    newX += line.x0;
+                    newY += line.y0;
 
                     g.drawLine(line.x0, line.y0, newX, newY);
                     break;
                 }
             }
-            System.out.println("BYE: " + toPrintLine);
         }
 
         // draw "turtel"

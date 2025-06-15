@@ -10,7 +10,8 @@ public class TurtelPanel extends JPanel {
     private final ArrayList<String> errors;
     private final Point turtelPos;
     private double angel;
-    private long totalLineLenght;
+    private long totalLineLength;
+    private long toPrintLine;
     private int maxX;
     private int maxY;
 
@@ -33,11 +34,32 @@ public class TurtelPanel extends JPanel {
         turtelPos.x = maxX / 2;
         turtelPos.y = maxY / 2;
         angel = 0;
-        totalLineLenght = 0;
+        totalLineLength = 0L;
     }
 
     private void paintLoop() {
-        repaint();
+        Thread t = new Thread(() -> {
+            toPrintLine = 0L;
+
+            double drawInterval = 1_000_000_000.0/120.0;
+            double delta = 0.0;
+            long lastTime = System.nanoTime();
+            long currentTime;
+
+            while (toPrintLine < totalLineLength) {
+                currentTime = System.nanoTime();
+                delta += (currentTime - lastTime) / drawInterval;
+                lastTime = currentTime;
+
+                if (delta >= 1) {
+                    repaint();
+                    toPrintLine = Math.min(toPrintLine + 10L, totalLineLength);
+                    delta--;
+                }
+            }
+        });
+
+        t.start();
     }
 
     @Override
@@ -45,8 +67,28 @@ public class TurtelPanel extends JPanel {
         super.paintComponent(g);
 
         // draw Lines
-        for (Line line : lines) {
-            line.draw(g);
+        if (!lines.isEmpty()) {
+            System.out.println("HELLO: " + toPrintLine);
+            long printed = 0L;
+            int i = 0;
+            while (printed < toPrintLine) {
+                Line line = lines.get(i);
+                if ((line.length() + printed) <= toPrintLine) {
+                    line.draw(g);
+                    printed += line.length();
+                    i++;
+                } else {
+                    long diff = toPrintLine - printed;
+                    float c = ((float) diff) / ((float) line.length());
+
+                    int newX = Math.round(line.x0 * c);
+                    int newY = Math.round(line.y0 * c);
+
+                    g.drawLine(line.x0, line.y0, newX, newY);
+                    break;
+                }
+            }
+            System.out.println("BYE: " + toPrintLine);
         }
 
         // draw "turtel"
@@ -59,8 +101,8 @@ public class TurtelPanel extends JPanel {
 
         // print errors
         g.setColor(Color.RED);
-        for (int i = 0; i < errors.size(); i++) {
-            g.drawString(errors.get(i), 0, (i + 1) * 20);
+        for (int j = 0; j < errors.size(); j++) {
+            g.drawString(errors.get(j), 0, (j + 1) * 20);
         }
 //        g.setColor(Color.BLACK);
     }
@@ -71,7 +113,7 @@ public class TurtelPanel extends JPanel {
 
         Line line = new Line(turtelPos.x, turtelPos.y, newX, newY);
         lines.add(line);
-        totalLineLenght += line.length();
+        totalLineLength += line.length();
 
         turtelPos.x = newX;
         turtelPos.y = newY;
@@ -120,7 +162,9 @@ public class TurtelPanel extends JPanel {
         }
     }
 
-    private static class NoCompOperatorException extends RuntimeException {}
+    private static class NoCompOperatorException extends RuntimeException {
+    }
+
     private boolean parseIf(int a, int b, String op) throws NoCompOperatorException {
         return switch (op) {
             case "==" -> a == b;

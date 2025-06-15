@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
-public class Turtel extends JPanel {
+public class Turtel extends JPanel implements MouseWheelListener {
     private final ArrayList<Line> lines;
     private final Point turtelPos;
     private double angel;
@@ -11,7 +13,12 @@ public class Turtel extends JPanel {
     private int maxX;
     private int maxY;
 
+    private double scale;
+
     public Turtel(int width, int height) {
+        this.addMouseWheelListener(this);
+        scale = 1;
+
         maxX = width;
         maxY = height;
 
@@ -59,6 +66,9 @@ public class Turtel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.scale(scale,  scale);
 
         // draw Lines
         if (!lines.isEmpty()) {
@@ -86,12 +96,13 @@ public class Turtel extends JPanel {
         }
 
         // draw "turtel"
-        Graphics2D g2 = (Graphics2D) g;
         g2.translate(turtelPos.x, turtelPos.y);
         g2.rotate(angel);
         g2.drawChars(new char[]{'>'}, 0, 1, 0, 0);
         g2.rotate(-angel);
         g2.translate(-turtelPos.x, -turtelPos.y);
+
+        g2.scale(1/scale, 1/scale);
     }
 
     public void move(int length) {
@@ -115,5 +126,13 @@ public class Turtel extends JPanel {
                 angel = (angel - Math.toRadians(angelDeg)) % (2 * Math.PI);
                 break;
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int upDown = e.getWheelRotation();
+        double factor = upDown * 0.1;
+        scale += factor;
+        repaint();
     }
 }

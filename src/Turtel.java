@@ -1,4 +1,4 @@
-import exeptions.InvalidExceptionable;
+import exeptions.InvalidLenghtExceptionable;
 import exeptions.NotAColorException;
 
 import javax.imageio.ImageIO;
@@ -146,8 +146,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         g2.scale(1 / scale, 1 / scale);
     }
 
-    public void move(int length) throws InvalidExceptionable {
-        if (length <= 0) throw new InvalidExceptionable();
+    public void move(int length) throws InvalidLenghtExceptionable {
+        if (length <= 0) throw new InvalidLenghtExceptionable();
 
         int newX = (int) Math.round(turtelPosX + length * Math.cos(angel));
         int newY = (int) Math.round(turtelPosY + length * Math.sin(angel));

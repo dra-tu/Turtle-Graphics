@@ -1,4 +1,4 @@
-import exeptions.InvalidExceptionable;
+import exeptions.InvalidLenghtExceptionable;
 import exeptions.NoCompOperatorException;
 import exeptions.NotAColorException;
 
@@ -71,7 +71,7 @@ public class TurtelCommands {
                 case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
                 case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
                 case "*" -> parse(values, funVals, input[0]) * parse(values, funVals, input[2]);
-                case "/" -> parse(values, funVals, input[0]) / parse(values, funVals, input[2]);
+                case "/" -> Math.round(((float) parse(values, funVals, input[0])) / ((float) parse(values, funVals, input[2])));
                 default -> throw new NumberFormatException();
             };
 
@@ -91,14 +91,14 @@ public class TurtelCommands {
         }
     }
 
-    public void executeCommands(String commandList) {
+    public boolean executeCommands(String commandList) {
         HashMap<String, Function> funMap = new HashMap<>();
         HashMap<String, Integer> funValues = new HashMap<>();
 
-        executeCommands(commandList, true, MAIN_FUN_NAME, funMap, funValues);
+        return executeCommands(commandList, true, MAIN_FUN_NAME, funMap, funValues);
     }
 
-    private void executeCommands(
+    private boolean executeCommands(
             String commandList,
             boolean reset,
             String currentFun,
@@ -112,7 +112,7 @@ public class TurtelCommands {
         HashMap<String, Integer> values = new HashMap<>();
 
         boolean inFun = false;
-        String funName = MAIN_FUN_NAME;
+        String funName = null;
         StringBuilder funBody = null;
         String[] funArgsNames = null;
 
@@ -142,7 +142,7 @@ public class TurtelCommands {
                     case "MOVE":
                         if (args.length != 1) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
                         int length = parse(values, funValues, args[0]);
                         turtel.move(length);
@@ -150,7 +150,7 @@ public class TurtelCommands {
                     case "ROTATE":
                         if (args.length != 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
                         int angel = parse(values, funValues, args[1]);
                         turtel.rotate(args[0], angel);
@@ -158,7 +158,7 @@ public class TurtelCommands {
                     case "COLOR":
                         if (args.length != 3) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
                         int r = parse(values, funValues, args[0]);
                         int g = parse(values, funValues, args[1]);
@@ -179,7 +179,7 @@ public class TurtelCommands {
                     case "VAL":
                         if (args.length != 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
                         values.put(args[0], parse(values, funValues, args[1]));
                         break;
@@ -187,15 +187,15 @@ public class TurtelCommands {
                     case "FUN":
                         if (args.length == 0) {
                             addError(ErrorType.ARG_NUM, i, funName);
-                            continue;
+                            return false;
                         }
                         if (args[0].equals(MAIN_FUN_NAME)) {
                             addError(ErrorType.MAIN_FUN, i, funName);
-                            continue;
+                            return false;
                         }
                         if (inFun) {
                             addError(ErrorType.FUN_IN_FUN, i, currentFun);
-                            continue;
+                            return false;
                         }
                         inFun = true;
                         funName = args[0];
@@ -206,7 +206,7 @@ public class TurtelCommands {
                     case "END":
                         if (!inFun) {
                             addError(ErrorType.END_OUT_OF_FUN, i, currentFun);
-                            continue;
+                            return false;
                         }
                         inFun = false;
                         assert funBody != null;
@@ -215,12 +215,12 @@ public class TurtelCommands {
                     case "CALL_IF":
                         if (args.length < 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
                         String[] split = args[0].split(" ");
                         if (split.length != 3) {
                             addError(ErrorType.COMP_FALSELY_FORMAT, i, currentFun);
-                            continue;
+                            return false;
                         }
                         int left = parse(values, funValues, split[0]);
                         int right = parse(values, funValues, split[2]);
@@ -232,11 +232,11 @@ public class TurtelCommands {
                         Function callFun = funMap.get(args[arg_offset]);
                         if (callFun == null) {
                             addError(ErrorType.UNKNOWN_FUN, i, currentFun);
-                            continue;
+                            return false;
                         }
                         if ((args.length - 1 - arg_offset) != callFun.getArgsCount()) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            continue;
+                            return false;
                         }
 
                         HashMap<String, Integer> callVals = new HashMap<>();
@@ -249,15 +249,20 @@ public class TurtelCommands {
                 }
             } catch (NumberFormatException ignored) {
                 addError(ErrorType.NOT_A_NUM, i, funName);
+                return false;
             } catch (NoCompOperatorException ignored) {
                 addError(ErrorType.UNKNOWN_COMP, i, funName);
+                return false;
             } catch (NotAColorException ignored) {
                 addError(ErrorType.NO_COLOR, i, funName);
-            } catch (InvalidExceptionable ignored) {
+                return false;
+            } catch (InvalidLenghtExceptionable ignored) {
                 addError(ErrorType.INVALID_LENGTH, i, funName);
+                return false;
             }
         }
 
         if (reset) turtel.start();
+        return true;
     }
 }

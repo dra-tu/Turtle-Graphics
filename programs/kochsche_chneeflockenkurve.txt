@@ -1,0 +1,39 @@
+FUN M | len
+	MOVE len
+END
+
+FUN F | a | length
+	VAL part | CALC length / 3
+	VAL newA | CALC a - 1
+
+	CALL_IF a != 0 | F | newA | part
+	CALL_IF a == 0 | M | part
+
+	ROTATE L | 60
+
+    CALL_IF a != 0 | F | newA | part
+	CALL_IF a == 0 | M | part
+
+	ROTATE R | 120
+
+	CALL_IF a != 0 | F | newA | part
+    CALL_IF a == 0 | M | part
+
+	ROTATE L | 60
+
+	CALL_IF a != 0 | F | newA | part
+    CALL_IF a == 0 | M | part
+END
+
+FUN START | length | depth
+    CALL F | depth | length
+    PEN_UP
+    ROTATE R | 90
+    MOVE 50
+    ROTATE R | 90
+    PEN_DOWN
+    COLOR 255 |255|0
+    MOVE length
+END
+
+CALL START | 200 | 2

@@ -1,0 +1,19 @@
+FUN CUBE | length
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 91
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+END
+
+FUN CUBE_CIRCLE | i | le
+	CALL CUBE | le
+	ROTATE L | 10
+	VAL new | CALC i - 1
+	CALL_IF new > 0 | CUBE_CIRCLE | new | le
+END
+
+CALL CUBE_CIRCLE | 36 | 200

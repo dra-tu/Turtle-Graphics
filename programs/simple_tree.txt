@@ -1,0 +1,31 @@
+FUN TREE_BRANCH | depth | length
+	ROTATE L | 30
+	CALL TREE | depth | length
+
+	ROTATE R | 60
+	CALL TREE | depth | length
+
+	ROTATE L | 30
+END
+
+FUN BRANCH | length
+	MOVE length
+END
+
+FUN TREE | depth | length
+	CALL BRANCH | length
+
+	VAL newDepth | CALC depth - 1
+	VAL newLength | CALC length * 0.7
+
+	CALL_IF newDepth > 0 | TREE_BRANCH | newDepth | newLength
+
+	PEN_UP
+	ROTATE R | 180
+	MOVE length
+	ROTATE R | 180
+	PEN_DOWN
+END
+
+COLOR 139 | 69 | 19
+CALL TREE | 6 | 100

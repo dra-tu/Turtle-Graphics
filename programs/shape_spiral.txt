@@ -1,0 +1,104 @@
+FUN COLOR_SELECT | id
+	CALL_IF id == 0 | RED
+	CALL_IF id == 1 | GREEN
+	CALL_IF id == 2 | BLUE
+	CALL_IF id == 3 | YELLOW
+	CALL_IF id == 4 | WHITE
+	CALL_IF id == 5 | PURPLE
+	CALL_IF id == 6 | AQUA
+	CALL_IF id == 7 | GRAY
+END
+
+FUN RED
+	COLOR 255 | 0 | 0
+END
+FUN GREEN
+	COLOR 0 | 255 | 0
+END
+FUN BLUE
+	COLOR 0 | 0 | 255
+END
+FUN YELLOW
+	COLOR 255 | 255 | 0
+END
+FUN WHITE
+    COLOR 255 | 255 | 255
+END
+FUN PURPLE
+    COLOR 255 | 0 | 255
+END
+FUN AQUA
+    COLOR 0 | 255 | 255
+END
+FUN GRAY
+    COLOR 170 | 170 | 170
+END
+
+FUN CUBE | length
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+END
+
+FUN TRIANGLE | length
+	MOVE length
+	ROTATE L | 120
+	MOVE length
+	ROTATE L | 120
+	MOVE length
+	ROTATE L | 120
+END
+
+FUN SHAPE_LINE | i | length | shape
+	CALL_IF shape == 0 | CUBE | length
+	CALL_IF shape == 1 | TRIANGLE | length
+
+	PEN_UP
+	VAL half | CALC length / 2
+	MOVE half
+	ROTATE L | 90
+	MOVE half
+	ROTATE R | 90
+	PEN_DOWN
+
+	VAL next_i | CALC i - 1
+	CALL_IF next_i > 0 | SHAPE_LINE | next_i | length | shape
+END
+
+FUN SPIRAL_LAYER | layer | max
+	VAL color_id | CALC layer % 8
+	VAL shape_id | CALC layer % 2
+	VAL size_temp | CALC layer * 5
+	VAL size | CALC 40 + size_temp
+
+	CALL COLOR_SELECT | color_id
+	CALL SHAPE_LINE | 5 | size | shape_id
+
+	ROTATE L | 90
+
+	VAL next | CALC layer + 1
+	CALL_IF next < max | SPIRAL_LAYER | next | max
+END
+
+FUN SPIRAL | layers
+    VAL arms | CALC layers * 4
+    CALL SPIRAL_LAYER | 0 | arms
+END
+
+FUN SPIRAL_CUBE | step
+	VAL size | CALC 5 - step
+
+	CALL SPIRAL | size
+	ROTATE R | 90
+	MOVE 500
+
+	VAL next | CALC step + 1
+	CALL_IF next <= 3  | SPIRAL_CUBE | next
+END
+
+CALL SPIRAL_CUBE | 0

@@ -1,0 +1,53 @@
+FUN CUBE | length
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+	MOVE length
+	ROTATE L | 90
+END
+
+FUN CUBE_LINE | i | length
+	CALL CUBE | 50
+
+	PEN_UP
+	MOVE 25
+	ROTATE L | 90
+	MOVE 25
+	ROTATE R | 90
+	PEN_DOWN
+
+	VAL i- | CALC i - 1
+	CALL_IF i- != 0 | CUBE_LINE | i- | length
+END
+
+FUN RED
+	COLOR 255 | 0 | 0
+END
+FUN GREEN
+	COLOR 0 | 255 | 0
+END
+FUN BLUE
+	COLOR 0 | 0 | 255
+END
+FUN YELLOW
+	COLOR 255 | 255 | 0
+END
+
+FUN FOR_1 | a
+	CALL_IF a == 0 | RED
+	CALL_IF a == 1 | GREEN
+	CALL_IF a == 2 | BLUE
+	CALL_IF a == 3 | YELLOW
+
+
+	CALL CUBE_LINE | 10 | 80
+	ROTATE L | 90
+
+	VAL a+ | CALC a + 1
+	CALL_IF a+ < 4 | FOR_1 | a+
+END
+
+CALL FOR_1 | 0

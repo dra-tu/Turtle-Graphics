@@ -61,17 +61,22 @@ public class TurtelCommands {
         };
     }
 
-    private int parse(HashMap<String, Integer> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
+    private int parse(HashMap<String, Float> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
+        return Math.round(parseFloat(values, funVals, value));
+    }
+
+    private float parseFloat(HashMap<String, Float> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
         if (value.startsWith("CALC ")) {
             value = value.replace("CALC ", "");
             String[] input = value.split(" ");
 
             if (input.length != 3) throw new NumberFormatException();
             return switch (input[1]) {
-                case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
-                case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
-                case "*" -> parse(values, funVals, input[0]) * parse(values, funVals, input[2]);
-                case "/" -> Math.round(((float) parse(values, funVals, input[0])) / ((float) parse(values, funVals, input[2])));
+                case "+" -> parseFloat(values, funVals, input[0]) + parseFloat(values, funVals, input[2]);
+                case "-" -> parseFloat(values, funVals, input[0]) - parseFloat(values, funVals, input[2]);
+                case "*" -> parseFloat(values, funVals, input[0]) * parseFloat(values, funVals, input[2]);
+                case "/" -> parseFloat(values, funVals, input[0]) / parseFloat(values, funVals, input[2]);
+                case "%" -> parseFloat(values, funVals, input[0]) % parseFloat(values, funVals, input[2]);
                 default -> throw new NumberFormatException();
             };
 
@@ -82,9 +87,9 @@ public class TurtelCommands {
                 : funVals.get(value);
 
         if (funStored == null) {
-            Integer stored = values.get(value);
+            Float stored = values.get(value);
             return stored == null
-                    ? Integer.parseInt(value)
+                    ? Float.parseFloat(value)
                     : stored;
         } else {
             return funStored;
@@ -109,7 +114,7 @@ public class TurtelCommands {
 
         if (reset) reset();
 
-        HashMap<String, Integer> values = new HashMap<>();
+        HashMap<String, Float> values = new HashMap<>();
 
         boolean inFun = false;
         String funName = null;
@@ -181,7 +186,7 @@ public class TurtelCommands {
                             addError(ErrorType.ARG_NUM, i, currentFun);
                             return false;
                         }
-                        values.put(args[0], parse(values, funValues, args[1]));
+                        values.put(args[0], parseFloat(values, funValues, args[1]));
                         break;
 
                     case "FUN":

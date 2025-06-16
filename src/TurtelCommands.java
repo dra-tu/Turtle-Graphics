@@ -1,3 +1,4 @@
+import exeptions.InvalidExceptionable;
 import exeptions.NoCompOperatorException;
 import exeptions.NotAColorException;
 
@@ -28,39 +29,24 @@ public class TurtelCommands {
     }
 
     private enum ErrorType {
-        ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN, NO_COLOR,
+        ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN, NO_COLOR, INVALID_LENGTH,
     }
 
     private void addError(ErrorType e, int line, String funName) {
-        switch (e) {
-            case ARG_NUM:
-                errors.add("wrong number of args at line " + line + " of " + funName);
-                break;
-            case NOT_A_NUM:
-                errors.add("Not a number at line " + line + " of " + funName);
-                break;
-            case FUN_IN_FUN:
-                errors.add("FUN in Fun at line " + line + " of " + funName);
-                break;
-            case END_OUT_OF_FUN:
-                errors.add("END before FUN at line " + line + " of " + funName);
-                break;
-            case UNKNOWN_FUN:
-                errors.add("Unknown FUN at line " + line + " of " + funName);
-                break;
-            case COMP_FALSELY_FORMAT:
-                errors.add("Comparison is falsely formated at line " + line + " of " + funName);
-                break;
-            case UNKNOWN_COMP:
-                errors.add("Unknown comparison at line " + line + " of " + funName);
-                break;
-            case MAIN_FUN:
-                errors.add("FUN with name " + MAIN_FUN_NAME + " is not allowed at line " + line);
-                break;
-            case NO_COLOR:
-                errors.add("This is not a color at line " + line + " of " + funName);
-                break;
-        }
+        String msg = switch (e) {
+            case ARG_NUM -> "wrong number of args";
+            case NOT_A_NUM -> "Not a number";
+            case FUN_IN_FUN -> "FUN in Fun";
+            case END_OUT_OF_FUN -> "END before FUN";
+            case UNKNOWN_FUN -> "Unknown FUN";
+            case COMP_FALSELY_FORMAT -> "Comparison is falsely formated";
+            case UNKNOWN_COMP -> "Unknown comparison";
+            case MAIN_FUN -> "FUN with name " + MAIN_FUN_NAME + " is not allowed";
+            case NO_COLOR -> "This is not a color at line";
+            case INVALID_LENGTH -> "LENGTH IN MOVE MUST BE > 0";
+        };
+
+        errors.add(msg + " at line " + line + " in " + funName);
     }
 
     private boolean parseIf(int a, int b, String op) throws NoCompOperatorException {
@@ -106,18 +92,16 @@ public class TurtelCommands {
     }
 
     public void executeCommands(String commandList) {
-        HashMap<String, Integer> values = new HashMap<>();
         HashMap<String, Function> funMap = new HashMap<>();
         HashMap<String, Integer> funValues = new HashMap<>();
 
-        executeCommands(commandList, true, MAIN_FUN_NAME, values, funMap, funValues);
+        executeCommands(commandList, true, MAIN_FUN_NAME, funMap, funValues);
     }
 
     private void executeCommands(
             String commandList,
             boolean reset,
             String currentFun,
-            HashMap<String, Integer> values,
             HashMap<String, Function> funMap,
             HashMap<String, Integer> funValues
     ) {
@@ -125,8 +109,10 @@ public class TurtelCommands {
 
         if (reset) reset();
 
+        HashMap<String, Integer> values = new HashMap<>();
+
         boolean inFun = false;
-        String funName = null;
+        String funName = MAIN_FUN_NAME;
         StringBuilder funBody = null;
         String[] funArgsNames = null;
 
@@ -258,7 +244,7 @@ public class TurtelCommands {
                             callVals.put(callFun.getArgName(j), parse(values, funValues, args[arg_offset + j + 1]));
                         }
 
-                        executeCommands(callFun.getBody(), false, args[arg_offset], values, funMap, callVals);
+                        executeCommands(callFun.getBody(), false, args[arg_offset], funMap, callVals);
                         break;
                 }
             } catch (NumberFormatException ignored) {
@@ -267,6 +253,8 @@ public class TurtelCommands {
                 addError(ErrorType.UNKNOWN_COMP, i, funName);
             } catch (NotAColorException ignored) {
                 addError(ErrorType.NO_COLOR, i, funName);
+            } catch (InvalidExceptionable ignored) {
+                addError(ErrorType.INVALID_LENGTH, i, funName);
             }
         }
 

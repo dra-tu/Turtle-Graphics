@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class Turtel extends JPanel implements MouseWheelListener, MouseMotionListener {
     private final static Color DEFAOULT_COLOR = Color.WHITE;
-    private final static int TURTLE_IMG_SIZE = 20;
+    private final static int TURTLE_IMG_SIZE = 20_000;
     public final static BufferedImage TURTEL_IMG;
 
     private final ArrayList<Line> lines;

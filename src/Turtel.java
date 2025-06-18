@@ -48,7 +48,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         this.addMouseWheelListener(this);
         this.addMouseMotionListener(this);
-        scale = 1;
+        scale = 0.3;
 
         START_X = width / 2;
         START_Y = height / 2;
@@ -105,7 +105,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         Graphics2D g2 = (Graphics2D) g;
 
         g2.scale(scale, scale);
-
         g2.translate(viewTranslation.x, viewTranslation.y);
 
         int lastX = turtelPosX;
@@ -130,7 +129,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
                     lastX = Math.round((line.x1() - line.x0()) * c) + line.x0();
                     lastY = Math.round((line.y1() - line.y0()) * c) + line.y0();
 
-                    g.drawLine(line.x0(), line.y0(), lastX, lastY);
+                    line.drawPart(g2, lastX, lastY);
                     break;
                 }
             }
@@ -192,8 +191,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int upDown = e.getWheelRotation();
-        double factor = upDown * 0.1;
-        scale = Math.clamp(scale - factor, 0.1, 5.0);
+        double factor = upDown * 0.5;
+        scale = scale - factor;
         repaint();
     }
 

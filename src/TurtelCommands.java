@@ -61,22 +61,18 @@ public class TurtelCommands {
         };
     }
 
-    private int parse(HashMap<String, Float> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
-        return Math.round(parseFloat(values, funVals, value));
-    }
-
-    private float parseFloat(HashMap<String, Float> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
+    private int parse(HashMap<String, Integer> values, HashMap<String, Integer> funVals, String value) throws NumberFormatException {
         if (value.startsWith("CALC ")) {
             value = value.replace("CALC ", "");
             String[] input = value.split(" ");
 
             if (input.length != 3) throw new NumberFormatException();
             return switch (input[1]) {
-                case "+" -> parseFloat(values, funVals, input[0]) + parseFloat(values, funVals, input[2]);
-                case "-" -> parseFloat(values, funVals, input[0]) - parseFloat(values, funVals, input[2]);
-                case "*" -> parseFloat(values, funVals, input[0]) * parseFloat(values, funVals, input[2]);
-                case "/" -> parseFloat(values, funVals, input[0]) / parseFloat(values, funVals, input[2]);
-                case "%" -> parseFloat(values, funVals, input[0]) % parseFloat(values, funVals, input[2]);
+                case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
+                case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
+                case "*" -> parse(values, funVals, input[0]) * parse(values, funVals, input[2]);
+                case "/" -> parse(values, funVals, input[0]) / parse(values, funVals, input[2]);
+                case "%" -> parse(values, funVals, input[0]) % parse(values, funVals, input[2]);
                 default -> throw new NumberFormatException();
             };
 
@@ -87,13 +83,32 @@ public class TurtelCommands {
                 : funVals.get(value);
 
         if (funStored == null) {
-            Float stored = values.get(value);
+            Integer stored = values.get(value);
             return stored == null
-                    ? Float.parseFloat(value)
+                    ? parseNumber(value)
                     : stored;
         } else {
             return funStored;
         }
+    }
+
+    private int parseNumber(String numberStr) throws NumberFormatException {
+        String cleared = numberStr.replace("_", "");
+        String[] numParts = cleared.split("\\.", 2);
+
+        if (numParts[0].length() > 5) throw new NumberFormatException();
+
+        int leftPart = Integer.parseInt(numParts[0]);
+        int rightPart = 0;
+        if (numParts.length == 2) {
+            if (numParts[1].length() > 5) throw new NumberFormatException();
+
+            numParts[1] = String.format("%-5s", numParts[1]);
+            numParts[1] = numParts[1].replace(" ", "0");
+            rightPart = Integer.parseInt(numParts[1]);
+        }
+
+        return leftPart*100_000 + rightPart;
     }
 
     public void executeCommands(String commandList) {
@@ -112,9 +127,13 @@ public class TurtelCommands {
     ) {
         String[] commands = commandList.split("\n");
 
-        if (reset) reset();
+        long startTime = 0;
+        if (reset) {
+            startTime = System.nanoTime();
+            reset();
+        }
 
-        HashMap<String, Float> values = new HashMap<>();
+        HashMap<String, Integer> values = new HashMap<>();
 
         boolean inFun = false;
         String funName = null;
@@ -186,7 +205,7 @@ public class TurtelCommands {
                             addError(ErrorType.ARG_NUM, i, currentFun);
                             return;
                         }
-                        values.put(args[0], parseFloat(values, funValues, args[1]));
+                        values.put(args[0], parse(values, funValues, args[1]));
                         break;
 
                     case "FUN":
@@ -267,6 +286,10 @@ public class TurtelCommands {
             }
         }
 
-        if (reset) turtel.start();
+        if (reset) {
+            long endTime = System.nanoTime();
+            System.out.printf("Pars time: %,fs %n", (double) (endTime - startTime) / 1_000_000_000.0);
+            turtel.start();
+        }
     }
 }

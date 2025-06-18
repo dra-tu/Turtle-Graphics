@@ -96,19 +96,19 @@ public class TurtelCommands {
         String cleared = numberStr.replace("_", "");
         String[] numParts = cleared.split("\\.", 2);
 
-        if (numParts[0].length() > 5) throw new NumberFormatException();
+        if (numParts[0].length() > 7) throw new NumberFormatException();
 
         int leftPart = Integer.parseInt(numParts[0]);
         int rightPart = 0;
         if (numParts.length == 2) {
-            if (numParts[1].length() > 5) throw new NumberFormatException();
+            if (numParts[1].length() > 3) throw new NumberFormatException();
 
-            numParts[1] = String.format("%-5s", numParts[1]);
+            numParts[1] = String.format("%-3s", numParts[1]);
             numParts[1] = numParts[1].replace(" ", "0");
             rightPart = Integer.parseInt(numParts[1]);
         }
 
-        return leftPart*100_000 + rightPart;
+        return leftPart*1_000 + rightPart;
     }
 
     public void executeCommands(String commandList) {

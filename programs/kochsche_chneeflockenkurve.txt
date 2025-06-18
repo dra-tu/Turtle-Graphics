@@ -1,39 +1,49 @@
-FUN M | len
+FUN M | lFUN M | len
 	MOVE len
+END
+FUN RL | ang
+	ROTATE L | ang
+END
+FUN RR | ang
+	ROTATE R | ang
+END
+
+FUN BASE_CASE | len
+	MOVE len
+END
+
+FUN SPLIT | a | len
+	CALL  F | a | len
+	CALL RL | 60
+	CALL F | a | len
+	CALL RR | 120
+	CALL F | a | len
+	CALL RL | 60
+	CALL F | a | len
 END
 
 FUN F | a | length
 	VAL part | CALC length / 3
 	VAL newA | CALC a - 1
 
-	CALL_IF a != 0 | F | newA | part
-	CALL_IF a == 0 | M | part
+	CALL_IF a > 0 | SPLIT | newA | part
+	CALL_IF a <= 0 | BASE_CASE | length
+END
 
-	ROTATE L | 60
-
-    CALL_IF a != 0 | F | newA | part
-	CALL_IF a == 0 | M | part
-
+FUN FLACK | len | a
+	CALL F | a | len
 	ROTATE R | 120
-
-	CALL_IF a != 0 | F | newA | part
-    CALL_IF a == 0 | M | part
-
-	ROTATE L | 60
-
-	CALL_IF a != 0 | F | newA | part
-    CALL_IF a == 0 | M | part
+	CALL F | a | len
+	ROTATE R | 120
+	CALL F | a | len
+	ROTATE R | 120
 END
 
-FUN START | length | depth
-    CALL F | depth | length
-    PEN_UP
-    ROTATE R | 90
-    MOVE 50
-    ROTATE R | 90
-    PEN_DOWN
-    COLOR 255 |255|0
-    MOVE length
+FUN A | len | a
+	COLOR 255 | 0 | 255
+	CALL FLACK | len | 0
+	COLOR 255 | 255 | 255
+	CALL FLACK | len | a
 END
 
-CALL START | 200 | 2
+CALL A | 800 | 4

@@ -58,7 +58,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         buttonPanel.add(startButton);
         buttonPanel.add(clearButton);
         Dimension d = startButton.getSize();
-        d.width = width;
+        d.width = Integer.MAX_VALUE;
         buttonPanel.setMaximumSize(d);
         buttonPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
@@ -73,12 +73,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         JPanel spinnerPanel = new JPanel();
         spinnerPanel.add(spinnerFPS);
         spinnerPanel.add(spinnerStep);
-        d = new Dimension(width, 75);
-        spinnerPanel.setMaximumSize(d);
-        spinnerPanel.setMinimumSize(d);
         spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
+        Dimension e = spinnerPanel.getSize();
+        e.width = Integer.MAX_VALUE;
+        spinnerPanel.setMaximumSize(e);
 
         // finish
+        this.setMaximumSize(new Dimension(width, Integer.MAX_VALUE));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
         this.add(spinnerPanel);

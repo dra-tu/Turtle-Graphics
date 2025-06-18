@@ -58,8 +58,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         drawing = true;
 
-        setPreferredSize(new Dimension(width, height));
-
         viewTranslation = new Point(0, 0);
         lines = new ArrayList<>();
         reset();

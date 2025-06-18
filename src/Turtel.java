@@ -92,6 +92,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         });
 
         t.start();
+        System.out.println("START FUN");
     }
 
     @Override

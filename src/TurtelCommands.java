@@ -19,6 +19,10 @@ public class TurtelCommands {
         turtel.repaint();
     }
 
+    public void wark() {
+        turtel.start();
+    }
+
     public void reset() {
         turtel.reset();
         errors.clear();
@@ -70,9 +74,12 @@ public class TurtelCommands {
             return switch (input[1]) {
                 case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
                 case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
-                case "*" -> parseNum(realFloat(parse(values, funVals, input[0])) * realFloat(parse(values, funVals, input[2])));
-                case "/" -> parseNum(realFloat(parse(values, funVals, input[0])) / realFloat(parse(values, funVals, input[2])));
-                case "%" -> parseNum(realFloat(parse(values, funVals, input[0])) % realFloat(parse(values, funVals, input[2])));
+                case "*" ->
+                        parseNum(realFloat(parse(values, funVals, input[0])) * realFloat(parse(values, funVals, input[2])));
+                case "/" ->
+                        parseNum(realFloat(parse(values, funVals, input[0])) / realFloat(parse(values, funVals, input[2])));
+                case "%" ->
+                        parseNum(realFloat(parse(values, funVals, input[0])) % realFloat(parse(values, funVals, input[2])));
                 default -> throw new NumberFormatException();
             };
 
@@ -108,7 +115,7 @@ public class TurtelCommands {
             rightPart = Integer.parseInt(numParts[1]);
         }
 
-        return leftPart*1_000 + rightPart;
+        return leftPart * 1_000 + rightPart;
     }
 
     private int parseNum(float num) {
@@ -120,7 +127,7 @@ public class TurtelCommands {
     }
 
     private int round(int num) {
-        return Math.round(num/1000F);
+        return Math.round(num / 1000F);
     }
 
     public void executeCommands(String commandList) {
@@ -304,6 +311,6 @@ public class TurtelCommands {
             System.out.printf("Pars time: %,fs %n", (double) (endTime - startTime) / 1_000_000_000.0);
             turtel.start();
         }
-         return true;
+        return true;
     }
 }

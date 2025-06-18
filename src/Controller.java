@@ -7,6 +7,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class Controller extends JPanel implements ActionListener, DocumentListener, ChangeListener {
@@ -27,14 +28,17 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private final JSpinner spinnerFPS;
     private final JSpinner spinnerStep;
 
+    private boolean textChanged;
+
     public Controller(Turtel turtel) {
         this.turtelCom = new TurtelCommands(turtel);
         this.turtelAnim = new TurtelAnimationControl(turtel);
+        textChanged = false;
 
         // input Area
         inputArea = new JTextPane();
         doc = inputArea.getStyledDocument();
-        int tapWidth = inputArea.getFontMetrics( inputArea.getFont() ).charWidth(' ') * 4;
+        int tapWidth = inputArea.getFontMetrics(inputArea.getFont()).charWidth(' ') * 4;
         Style defStyle = doc.getStyle(DEFAULT);
         StyleConstants.setTabSet(defStyle, new TabSet(new TabStop[]{
                 new TabStop(tapWidth),
@@ -86,6 +90,28 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         this.add(spinnerPanel);
         this.add(scrollError);
         this.add(scrollInput);
+        setKeyBindings();
+    }
+
+    private void setKeyBindings() {
+        InputMap im = inputArea.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap am = inputArea.getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0), "clearKey");
+        am.put("clearKey", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clear();
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), "startKey");
+        am.put("startKey", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                start();
+            }
+        });
     }
 
     @Override
@@ -93,15 +119,45 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         JButton button = (JButton) e.getSource();
         switch (button.getText()) {
             case START:
-                turtelCom.executeCommands(inputArea.getText());
+                start();
                 break;
             case CLEAR:
-                inputArea.setText("");
-                turtelCom.reset();
-                turtelCom.draw();
+                clear();
                 break;
         }
+    }
 
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        JSpinner sp = (JSpinner) e.getSource();
+        Number num = (Number) sp.getValue();
+
+        if (sp == spinnerFPS) {
+            turtelAnim.setTargetFPS(num.doubleValue());
+        } else if (sp == spinnerStep) {
+            turtelAnim.setStepLength(num.longValue());
+        }
+    }
+
+    private void start() {
+        if (textChanged) {
+            turtelCom.executeCommands(inputArea.getText());
+            updateErrors();
+            textChanged = false;
+        } else {
+            turtelCom.wark();
+        }
+    }
+
+    private void clear() {
+        inputArea.setText("");
+        turtelCom.reset();
+        turtelCom.draw();
+        textChanged = true;
+        updateErrors();
+    }
+
+    private void updateErrors() {
         ArrayList<String> errors = turtelCom.getErrors();
         if (!errors.isEmpty()) {
             StringBuilder strBuild = new StringBuilder();
@@ -117,19 +173,6 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         }
 
         revalidate();
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        JSpinner sp = (JSpinner) e.getSource();
-
-        Number num = (Number) sp.getValue();
-
-        if (sp == spinnerFPS) {
-            turtelAnim.setTargetFPS(num.doubleValue());
-        } else if (sp == spinnerStep) {
-            turtelAnim.setStepLength(num.longValue());
-        }
     }
 
     private void highlight() {
@@ -149,7 +192,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                 }
                 if (wordEnd != text.length()) {
                     wordEnd--;
-                } else if (Character.isWhitespace(text.charAt(wordEnd-1))) {
+                } else if (Character.isWhitespace(text.charAt(wordEnd - 1))) {
                     wordEnd--;
                 }
 
@@ -168,11 +211,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     @Override
     public void insertUpdate(DocumentEvent e) {
         highlight();
+        textChanged = true;
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
         highlight();
+        textChanged = true;
     }
 
     @Override

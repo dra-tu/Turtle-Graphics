@@ -4,13 +4,11 @@ public record Line(int x0, int y0, int x1, int y1, Color color) {
     private static final int height = 100_000;
 
     public void draw(Graphics g) {
-        int width = x1 - x0;
-        g.fillRect(x0, y0, width, height);
+        g.drawLine(x0, y0, x1, y1);
     }
 
     public void drawPart(Graphics2D g, int x1, int y1) {
-        int width = x1 - x0;
-        g.fillRect(x0, y0, width, height);
+        g.drawLine(x0, y0, x1, y1);
     }
 
     public long length() {

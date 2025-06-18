@@ -130,7 +130,7 @@ public class TurtelCommands {
         executeCommands(commandList, true, MAIN_FUN_NAME, funMap, funValues);
     }
 
-    private void executeCommands(
+    private boolean executeCommands(
             String commandList,
             boolean reset,
             String currentFun,
@@ -178,7 +178,7 @@ public class TurtelCommands {
                     case "MOVE":
                         if (args.length != 1) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
                         int length = parse(values, funValues, args[0]);
                         turtel.move(length);
@@ -186,7 +186,7 @@ public class TurtelCommands {
                     case "ROTATE":
                         if (args.length != 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
                         int angel = parse(values, funValues, args[1]);
                         turtel.rotate(args[0], round(angel));
@@ -194,7 +194,7 @@ public class TurtelCommands {
                     case "COLOR":
                         if (args.length != 3) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
                         int r = round(parse(values, funValues, args[0]));
                         int g = round(parse(values, funValues, args[1]));
@@ -215,7 +215,7 @@ public class TurtelCommands {
                     case "VAL":
                         if (args.length != 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
                         values.put(args[0], parse(values, funValues, args[1]));
                         break;
@@ -223,15 +223,15 @@ public class TurtelCommands {
                     case "FUN":
                         if (args.length == 0) {
                             addError(ErrorType.ARG_NUM, i, funName);
-                            return;
+                            return false;
                         }
                         if (args[0].equals(MAIN_FUN_NAME)) {
                             addError(ErrorType.MAIN_FUN, i, funName);
-                            return;
+                            return false;
                         }
                         if (inFun) {
                             addError(ErrorType.FUN_IN_FUN, i, currentFun);
-                            return;
+                            return false;
                         }
                         inFun = true;
                         funName = args[0];
@@ -242,7 +242,7 @@ public class TurtelCommands {
                     case "END":
                         if (!inFun) {
                             addError(ErrorType.END_OUT_OF_FUN, i, currentFun);
-                            return;
+                            return false;
                         }
                         inFun = false;
                         assert funBody != null;
@@ -251,12 +251,12 @@ public class TurtelCommands {
                     case "CALL_IF":
                         if (args.length < 2) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
                         String[] split = args[0].split(" ");
                         if (split.length != 3) {
                             addError(ErrorType.COMP_FALSELY_FORMAT, i, currentFun);
-                            return;
+                            return false;
                         }
                         int left = parse(values, funValues, split[0]);
                         int right = parse(values, funValues, split[2]);
@@ -268,11 +268,11 @@ public class TurtelCommands {
                         Function callFun = funMap.get(args[arg_offset]);
                         if (callFun == null) {
                             addError(ErrorType.UNKNOWN_FUN, i, currentFun);
-                            return;
+                            return false;
                         }
                         if ((args.length - 1 - arg_offset) != callFun.getArgsCount()) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
-                            return;
+                            return false;
                         }
 
                         HashMap<String, Integer> callVals = new HashMap<>();
@@ -280,21 +280,22 @@ public class TurtelCommands {
                             callVals.put(callFun.getArgName(j), parse(values, funValues, args[arg_offset + j + 1]));
                         }
 
-                        executeCommands(callFun.getBody(), false, args[arg_offset], funMap, callVals);
+                        boolean isOk = executeCommands(callFun.getBody(), false, args[arg_offset], funMap, callVals);
+                        if (!isOk) return false;
                         break;
                 }
             } catch (NumberFormatException ignored) {
                 addError(ErrorType.NOT_A_NUM, i, funName);
-                return;
+                return false;
             } catch (NoCompOperatorException ignored) {
                 addError(ErrorType.UNKNOWN_COMP, i, funName);
-                return;
+                return false;
             } catch (NotAColorException ignored) {
                 addError(ErrorType.NO_COLOR, i, funName);
-                return;
+                return false;
             } catch (InvalidLengthException ignored) {
                 addError(ErrorType.INVALID_LENGTH, i, funName);
-                return;
+                return false;
             }
         }
 
@@ -303,5 +304,6 @@ public class TurtelCommands {
             System.out.printf("Pars time: %,fs %n", (double) (endTime - startTime) / 1_000_000_000.0);
             turtel.start();
         }
+         return true;
     }
 }

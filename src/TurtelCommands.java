@@ -70,9 +70,9 @@ public class TurtelCommands {
             return switch (input[1]) {
                 case "+" -> parse(values, funVals, input[0]) + parse(values, funVals, input[2]);
                 case "-" -> parse(values, funVals, input[0]) - parse(values, funVals, input[2]);
-                case "*" -> parse(values, funVals, input[0]) * parse(values, funVals, input[2]);
-                case "/" -> parse(values, funVals, input[0]) / parse(values, funVals, input[2]);
-                case "%" -> parse(values, funVals, input[0]) % parse(values, funVals, input[2]);
+                case "*" -> parseNum(realFloat(parse(values, funVals, input[0])) * realFloat(parse(values, funVals, input[2])));
+                case "/" -> parseNum(realFloat(parse(values, funVals, input[0])) / realFloat(parse(values, funVals, input[2])));
+                case "%" -> parseNum(realFloat(parse(values, funVals, input[0])) % realFloat(parse(values, funVals, input[2])));
                 default -> throw new NumberFormatException();
             };
 
@@ -109,6 +109,18 @@ public class TurtelCommands {
         }
 
         return leftPart*1_000 + rightPart;
+    }
+
+    private int parseNum(float num) {
+        return (int) num * 1000;
+    }
+
+    private float realFloat(int num) {
+        return num / 1000F;
+    }
+
+    private int round(int num) {
+        return Math.round(num/1000F);
     }
 
     public void executeCommands(String commandList) {
@@ -177,16 +189,16 @@ public class TurtelCommands {
                             return;
                         }
                         int angel = parse(values, funValues, args[1]);
-                        turtel.rotate(args[0], angel);
+                        turtel.rotate(args[0], round(angel));
                         break;
                     case "COLOR":
                         if (args.length != 3) {
                             addError(ErrorType.ARG_NUM, i, currentFun);
                             return;
                         }
-                        int r = parse(values, funValues, args[0]);
-                        int g = parse(values, funValues, args[1]);
-                        int b = parse(values, funValues, args[2]);
+                        int r = round(parse(values, funValues, args[0]));
+                        int g = round(parse(values, funValues, args[1]));
+                        int b = round(parse(values, funValues, args[2]));
 
                         turtel.setColor(r, g, b);
                         break;

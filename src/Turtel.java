@@ -48,12 +48,12 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         this.addMouseWheelListener(this);
         this.addMouseMotionListener(this);
-        scale = 0.3;
+        scale = 0.001;
 
         START_X = width / 2;
         START_Y = height / 2;
 
-        stepLength = 10L;
+        stepLength = 10_000L;
         targetFPS = 120.0;
 
         drawing = true;
@@ -189,8 +189,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int upDown = e.getWheelRotation();
-        double factor = upDown * 0.5;
-        scale = scale - factor;
+        double factor = upDown * 0.00001;
+        scale = Math.clamp(scale - factor, 0.00001, 1);
         repaint();
     }
 

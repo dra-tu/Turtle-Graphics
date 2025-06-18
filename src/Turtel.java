@@ -22,8 +22,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     private Color lineColor;
     private long totalLineLength;
     private long toPrintLine;
-    private final int START_X;
-    private final int START_Y;
 
     private long lastDragTime;
     private Point lastDragPoint;
@@ -34,6 +32,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     public double targetFPS;
 
     private boolean drawing;
+
+    private boolean atStartPos;
 
     static {
         try {
@@ -50,9 +50,6 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         this.addMouseMotionListener(this);
         scale = 0.001;
 
-        START_X = width / 2;
-        START_Y = height / 2;
-
         stepLength = 10_000L;
         targetFPS = 120.0;
 
@@ -65,11 +62,11 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
     public void reset() {
         lines.clear();
-        turtelPosX = START_X;
-        turtelPosY = START_Y;
         angel = 0;
         totalLineLength = 0L;
         lineColor = DEFAOULT_COLOR;
+        atStartPos = true;
+        repaint();
     }
 
     public void start() {
@@ -100,6 +97,11 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (atStartPos) {
+            turtelPosX = (int) ((getWidth() / scale) / 2);
+            turtelPosY = (int) ((getHeight() / scale) / 2);
+        }
+
         Graphics2D g2 = (Graphics2D) g;
 
         g2.scale(scale, scale);
@@ -157,6 +159,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
         turtelPosX = newX;
         turtelPosY = newY;
+        atStartPos = false;
     }
 
     public void rotate(String direction, int angelDeg) {

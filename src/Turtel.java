@@ -43,7 +43,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         }
     }
 
-    public Turtel(int width, int height) {
+    public Turtel() {
         this.setBackground(Color.BLACK);
 
         this.addMouseWheelListener(this);

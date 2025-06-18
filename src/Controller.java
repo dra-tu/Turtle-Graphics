@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class Controller extends JPanel implements ActionListener, DocumentListener, ChangeListener {
     private static final String START = "Start";
     private static final String CLEAR = "Clear";
+    private static final int WIDTH = 200;
     private static final String DEFAULT = "default";
 
     private static final Dimension ZERO_DIMENSION = new Dimension(0, 0);
@@ -26,7 +27,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private final JSpinner spinnerFPS;
     private final JSpinner spinnerStep;
 
-    public Controller(int width, Turtel turtel) {
+    public Controller(Turtel turtel) {
         this.turtelCom = new TurtelCommands(turtel);
         this.turtelAnim = new TurtelAnimationControl(turtel);
 
@@ -79,7 +80,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         spinnerPanel.setMaximumSize(e);
 
         // finish
-        this.setMaximumSize(new Dimension(width, Integer.MAX_VALUE));
+        this.setMaximumSize(new Dimension(WIDTH, Integer.MAX_VALUE));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
         this.add(spinnerPanel);

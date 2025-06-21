@@ -1,0 +1,100 @@
+FUN COL_0 | max_d | depth
+	VAL col_per    | CALC depth / max_d
+    VAL green_temp | CALC col_per * -186
+    COLOR CALC col_per * 139 | CALC 255 + green_temp | CALC col_per * 19
+END
+FUN COL_1 | max_d | depth
+	VAL col_per   | CALC depth / max_d
+    VAL blue_temp | CALC col_per * -236
+    COLOR CALC col_per * 139 | CALC col_per * 69 | CALC 255 + blue_temp
+END
+FUN COL_2 | max_d | depth
+	VAL col_per  | CALC depth / max_d
+    VAL red_temp | CALC col_per * -116
+    COLOR CALC 255 + red_temp | CALC col_per * 69 | CALC col_per * 19
+END
+FUN COL_3 | max_d | depth
+	VAL col_per    | CALC depth / max_d
+    VAL red_temp   | CALC col_per * -116
+    VAL green_temp | CALC col_per * -186
+    VAL blue_temp  | CALC col_per * -236
+    COLOR CALC 255 + red_temp | CALC 255 + green_temp | CALC 255 + blue_temp
+END
+
+FUN SET_COLOR | index | max_d | depth
+	CALL_IF index == 0 | COL_0 | max_d | depth
+	CALL_IF index == 1 | COL_1 | max_d | depth
+	CALL_IF index == 2 | COL_2 | max_d | depth
+	CALL_IF index == 3 | COL_3 | max_d | depth
+END
+
+FUN LEAF | size
+    ROTATE L | 30
+    MOVE size
+    ROTATE R | 60
+    MOVE size
+    ROTATE R | 120
+    MOVE size
+    ROTATE R | 60
+    MOVE size
+	ROTATE R | 150
+END
+
+FUN TREE_BRANCH | variant | max_d | depth | length
+	ROTATE L | 30
+	CALL TREE | variant | max_d | depth | length
+
+	ROTATE R | 60
+	CALL TREE | variant | max_d | depth | length
+
+	ROTATE L | 30
+END
+
+FUN BRANCH | length
+	MOVE length
+END
+
+FUN TREE | variant | max_d | depth | length
+	CALL SET_COLOR | variant | max_d | depth
+
+	CALL BRANCH | length
+
+	VAL newDepth | CALC depth - 1
+	VAL newLength | CALC length * 0.7
+
+	CALL_IF newDepth > 0  | TREE_BRANCH | variant | max_d | newDepth | newLength
+	CALL_IF newDepth == 0 | LEAF | length
+
+	PEN_UP
+	ROTATE R | 180
+	MOVE length
+	ROTATE R | 180
+	PEN_DOWN
+END
+
+FUN TREE_START | variant | depth | length
+    CALL TREE | variant | depth | depth | length
+END
+
+FUN TREE_CIRCLE | index | depth | length
+	CALL TREE_START | index | depth  | length
+	ROTATE L | 90
+
+	VAL new | CALC index + 1
+	CALL_IF new < 4 | TREE_CIRCLE | new | depth | length
+END
+
+FUN COOL | i | max_i
+	CALL TREE_CIRCLE | 0 | i | 100
+
+	PEN_UP
+	ROTATE L | 45
+	VAL space | CALC 150 * i
+	MOVE space
+	PEN_DOWN
+
+	VAL new_i | CALC i + 1
+	CALL_IF new_i <= max_i | COOL | new_i | max_i
+END
+
+CALL COOL | 1 | 15

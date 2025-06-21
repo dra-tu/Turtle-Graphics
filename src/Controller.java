@@ -21,6 +21,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private final JTextArea errorBox;
     private final JScrollPane scrollError;
     private final JTextPane inputArea;
+    private final JLabel parseState;
     private final TurtelCommands turtelCom;
     private final TurtelAnimationControl turtelAnim;
     private final StyledDocument doc;
@@ -59,7 +60,13 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         startButton.addActionListener(this);
         clearButton.addActionListener(this);
 
+        JLabel parseText = new JLabel("Parse State");
+        parseState = new JLabel("-,--s");
+        parseState.setForeground(Color.GREEN);
+
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(parseText);
+        buttonPanel.add(parseState);
         buttonPanel.add(startButton);
         buttonPanel.add(clearButton);
         Dimension d = startButton.getSize();
@@ -85,6 +92,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
         // finish
         this.setMaximumSize(new Dimension(WIDTH, Integer.MAX_VALUE));
+        this.setMinimumSize(new Dimension(WIDTH, 0));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(buttonPanel);
         this.add(spinnerPanel);
@@ -141,12 +149,26 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
 
     private void start() {
         if (textChanged) {
-            turtelCom.executeCommands(inputArea.getText());
-            updateErrors();
-            textChanged = false;
+            parseState.setForeground(Color.YELLOW);
+            parseState.setText("PARSING");
+            inputArea.setEditable(false);
+            turtelCom.parseText(inputArea.getText(), this);
         } else {
             turtelCom.wark();
         }
+    }
+
+    public void parseDone(double parsTime) {
+        updateErrors();
+        parseState.setText(parsTime + "s");
+        if (errorBox.getText().isEmpty()) {
+            parseState.setForeground(Color.GREEN);
+        } else {
+            parseState.setForeground(Color.RED);
+        }
+        inputArea.setEditable(true);
+        textChanged = false;
+        turtelCom.wark();
     }
 
     private void clear() {

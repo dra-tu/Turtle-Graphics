@@ -35,6 +35,8 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
 
     private boolean atStartPos;
 
+    private boolean animThreadStop;
+
     static {
         try {
             TURTEL_IMG = ImageIO.read(Objects.requireNonNull(Turtel.class.getResourceAsStream("turtle.png")));
@@ -66,18 +68,20 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
         totalLineLength = 0L;
         lineColor = DEFAOULT_COLOR;
         atStartPos = true;
+        animThreadStop = true;
         repaint();
     }
 
     public void start() {
-        Thread t = new Thread(() -> {
+        animThreadStop = false;
+        Thread animationThread = new Thread(() -> {
             toPrintLine = 0L;
 
             double delta = 0.0;
             long lastTime = System.nanoTime();
             long currentTime;
 
-            while (toPrintLine < totalLineLength) {
+            while (toPrintLine < totalLineLength && !animThreadStop) {
                 double drawInterval = 1_000_000_000.0 / targetFPS;
                 currentTime = System.nanoTime();
                 delta += (currentTime - lastTime) / drawInterval;
@@ -89,10 +93,11 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
                     delta--;
                 }
             }
+
+            animThreadStop = true;
         });
 
-        t.start();
-        System.out.println("START FUN");
+        animationThread.start();
     }
 
     @Override

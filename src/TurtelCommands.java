@@ -130,27 +130,28 @@ public class TurtelCommands {
         return Math.round(num / 1000F);
     }
 
-    public void executeCommands(String commandList) {
-        HashMap<String, Function> funMap = new HashMap<>();
-        HashMap<String, Integer> funValues = new HashMap<>();
+    public void parseText(String commandList, Controller controller) {
+        reset();
 
-        executeCommands(commandList, true, MAIN_FUN_NAME, funMap, funValues);
+        Thread parseThread = new Thread(() -> {
+            HashMap<String, Function> funMap = new HashMap<>();
+            HashMap<String, Integer> funValues = new HashMap<>();
+
+            long startTime = System.nanoTime();
+            parseText(commandList, MAIN_FUN_NAME, funMap, funValues);
+            double time = (double) (System.nanoTime() - startTime) / 1_000_000_000.0;
+            controller.parseDone(time);
+        });
+        parseThread.start();
     }
 
-    private boolean executeCommands(
+    private boolean parseText(
             String commandList,
-            boolean reset,
             String currentFun,
             HashMap<String, Function> funMap,
             HashMap<String, Integer> funValues
     ) {
         String[] commands = commandList.split("\n");
-
-        long startTime = 0;
-        if (reset) {
-            startTime = System.nanoTime();
-            reset();
-        }
 
         HashMap<String, Integer> values = new HashMap<>();
 
@@ -287,7 +288,7 @@ public class TurtelCommands {
                             callVals.put(callFun.getArgName(j), parse(values, funValues, args[arg_offset + j + 1]));
                         }
 
-                        boolean isOk = executeCommands(callFun.getBody(), false, args[arg_offset], funMap, callVals);
+                        boolean isOk = parseText(callFun.getBody(), args[arg_offset], funMap, callVals);
                         if (!isOk) return false;
                         break;
                 }
@@ -306,11 +307,6 @@ public class TurtelCommands {
             }
         }
 
-        if (reset) {
-            long endTime = System.nanoTime();
-            System.out.printf("Pars time: %,fs %n", (double) (endTime - startTime) / 1_000_000_000.0);
-            turtel.start();
-        }
         return true;
     }
 }

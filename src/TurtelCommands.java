@@ -119,7 +119,7 @@ public class TurtelCommands {
     }
 
     private int parseNum(float num) {
-        return (int) num * 1000;
+        return (int) (num * 1000);
     }
 
     private float realFloat(int num) {

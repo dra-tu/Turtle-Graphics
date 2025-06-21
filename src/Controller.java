@@ -22,6 +22,7 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
     private final JScrollPane scrollError;
     private final JTextPane inputArea;
     private final JLabel parseState;
+    private final JLabel drawPercent;
     private final TurtelCommands turtelCom;
     private final TurtelAnimationControl turtelAnim;
     private final StyledDocument doc;
@@ -64,7 +65,12 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
         parseState = new JLabel("-,--s");
         parseState.setForeground(Color.GREEN);
 
+        JLabel drawText = new JLabel("Draw Percent");
+        drawPercent = new JLabel("--%");
+
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(drawText);
+        buttonPanel.add(drawPercent);
         buttonPanel.add(parseText);
         buttonPanel.add(parseState);
         buttonPanel.add(startButton);
@@ -133,6 +139,10 @@ public class Controller extends JPanel implements ActionListener, DocumentListen
                 clear();
                 break;
         }
+    }
+
+    public void setDrawPercent(int percent) {
+        drawPercent.setText(percent+"%");
     }
 
     @Override

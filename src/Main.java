@@ -8,8 +8,8 @@ public class Main {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Turtel turtel = new Turtel();
-
         Controller controller = new Controller(turtel);
+        turtel.setController(controller);
 
         f.add(controller);
         f.add(turtel);

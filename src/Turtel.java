@@ -32,10 +32,14 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
     public double targetFPS;
 
     private boolean drawing;
-
     private boolean atStartPos;
-
     private boolean animThreadStop;
+
+    private Controller controller;
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
 
     static {
         try {
@@ -90,6 +94,7 @@ public class Turtel extends JPanel implements MouseWheelListener, MouseMotionLis
                 if (delta >= 1) {
                     repaint();
                     toPrintLine = Math.min(toPrintLine + stepLength, totalLineLength);
+                    controller.setDrawPercent((int) (((float)toPrintLine/totalLineLength)*100));
                     delta--;
                 }
             }

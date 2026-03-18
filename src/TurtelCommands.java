@@ -10,6 +10,8 @@ public class TurtelCommands {
     private final ArrayList<String> errors;
     private final Turtel turtel;
 
+    private final int MAX_LOOP_STACK_SIZE = 10;
+
     public TurtelCommands(Turtel turtel) {
         errors = new ArrayList<>();
         this.turtel = turtel;
@@ -33,7 +35,10 @@ public class TurtelCommands {
     }
 
     private enum ErrorType {
-        ARG_NUM, NOT_A_NUM, FUN_IN_FUN, END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT, UNKNOWN_COMP, MAIN_FUN, NO_COLOR, INVALID_LENGTH,
+        ARG_NUM, NOT_A_NUM, FUN_IN_FUN,
+        END_OUT_OF_FUN, UNKNOWN_FUN, COMP_FALSELY_FORMAT,
+        UNKNOWN_COMP, MAIN_FUN, NO_COLOR,
+        INVALID_LENGTH, LOOP_END_OUT_OF_LOOP, LOOP_STACK_FULL, LOOP_HAS_NO_END
     }
 
     private void addError(ErrorType e, int line, String funName) {
@@ -48,6 +53,9 @@ public class TurtelCommands {
             case MAIN_FUN -> "FUN with name " + MAIN_FUN_NAME + " is not allowed";
             case NO_COLOR -> "This is not a color at line";
             case INVALID_LENGTH -> "LENGTH IN MOVE MUST BE > 0";
+            case LOOP_END_OUT_OF_LOOP -> "A LOOP END has to be after a LOOP";
+            case LOOP_STACK_FULL -> "The max amount of loops in loops is " + MAX_LOOP_STACK_SIZE;
+            case LOOP_HAS_NO_END -> "At the end of the program/Function is an unclosed LOOP";
         };
 
         errors.add(msg + " at line " + line + " in " + funName);
@@ -160,6 +168,11 @@ public class TurtelCommands {
         StringBuilder funBody = null;
         String[] funArgsNames = null;
 
+
+        int[] loop_start = new int[MAX_LOOP_STACK_SIZE];
+        int[] loop_count = new int[MAX_LOOP_STACK_SIZE];
+        int loop_p = -1;
+
         for (int i = 0; i < commands.length; i++) {
             if (commands[i].isBlank() || commands[i].startsWith("#")) continue;
 
@@ -226,6 +239,32 @@ public class TurtelCommands {
                             return false;
                         }
                         values.put(args[0], parse(values, funValues, args[1]));
+                        break;
+
+                    case "LOOP":
+                        if (loop_p + 1 >= MAX_LOOP_STACK_SIZE) {
+                            addError(ErrorType.LOOP_STACK_FULL, i, currentFun);
+                            return false;
+                        }
+                        if (args.length != 1) {
+                            addError(ErrorType.ARG_NUM, i, currentFun);
+                            return false;
+                        }
+                        loop_p++;
+                        loop_count[loop_p] = parse(values, funValues, args[0]);
+                        loop_start[loop_p] = i;
+                        break;
+                    case "LOOP_END":
+                        if (loop_p < 0) {
+                            addError(ErrorType.LOOP_END_OUT_OF_LOOP, i, currentFun);
+                            return false;
+                        }
+                        loop_count[loop_p] -= 1000;
+                        if (loop_count[loop_p] > 0) {
+                            i = loop_start[loop_p];
+                        } else {
+                            loop_p--;
+                        }
                         break;
 
                     case "FUN":
@@ -305,6 +344,11 @@ public class TurtelCommands {
                 addError(ErrorType.INVALID_LENGTH, i, funName);
                 return false;
             }
+        }
+
+        if (loop_p != -1) {
+            addError(ErrorType.LOOP_HAS_NO_END, commands.length, currentFun);
+            return false;
         }
 
         return true;
